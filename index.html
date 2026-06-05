@@ -1094,6 +1094,33 @@ const POKE_ES={
   'raging-bolt':'Electrofuria','iron-boulder':'Ferromole',
   'iron-crown':'Ferrotesta','terapagos':'Terapagos',
   'pecharunt':'Pecharunt',
+  // Formas Mega / Primal / Coronadas
+  'venusaur-mega':'Venusaur Mega','charizard-mega-x':'Charizard Mega X',
+  'charizard-mega-y':'Charizard Mega Y','blastoise-mega':'Blastoise Mega',
+  'alakazam-mega':'Alakazam Mega','gengar-mega':'Gengar Mega',
+  'kangaskhan-mega':'Kangaskhan Mega','pinsir-mega':'Pinsir Mega',
+  'gyarados-mega':'Gyarados Mega','aerodactyl-mega':'Aerodactyl Mega',
+  'mewtwo-mega-x':'Mewtwo Mega X','mewtwo-mega-y':'Mewtwo Mega Y',
+  'ampharos-mega':'Ampharos Mega','scizor-mega':'Scizor Mega',
+  'heracross-mega':'Heracross Mega','houndoom-mega':'Houndoom Mega',
+  'tyranitar-mega':'Tyranitar Mega','blaziken-mega':'Blaziken Mega',
+  'gardevoir-mega':'Gardevoir Mega','mawile-mega':'Mawile Mega',
+  'aggron-mega':'Aggron Mega','medicham-mega':'Medicham Mega',
+  'manectric-mega':'Manectric Mega','banette-mega':'Banette Mega',
+  'absol-mega':'Absol Mega','garchomp-mega':'Garchomp Mega',
+  'lucario-mega':'Lucario Mega','abomasnow-mega':'Abomasnow Mega',
+  'kyogre-primal':'Kyogre Primigenio','groudon-primal':'Groudon Primigenio',
+  'rayquaza-mega':'Rayquaza Mega','slowbro-mega':'Slowbro Mega',
+  'steelix-mega':'Steelix Mega','sceptile-mega':'Sceptile Mega',
+  'swampert-mega':'Swampert Mega','sableye-mega':'Sableye Mega',
+  'sharpedo-mega':'Sharpedo Mega','camerupt-mega':'Camerupt Mega',
+  'altaria-mega':'Altaria Mega','glalie-mega':'Glalie Mega',
+  'salamence-mega':'Salamence Mega','metagross-mega':'Metagross Mega',
+  'latias-mega':'Latias Mega','latios-mega':'Latios Mega',
+  'lopunny-mega':'Lopunny Mega','gallade-mega':'Gallade Mega',
+  'audino-mega':'Audino Mega','diancie-mega':'Diancie Mega',
+  'pidgeot-mega':'Pidgeot Mega','beedrill-mega':'Beedrill Mega',
+  'zacian-crowned':'Zacian Espada Suprema','zamazenta-crowned':'Zamazenta Escudo Supremo',
 };
 
 // Build reverse map: Spanish name (lowercase) -> slug, for bilingual pokemon search
@@ -1112,8 +1139,33 @@ function fmtName(n){
   return es&&es!==en?`${en} (${es})`:en;
 }
 function padId(id){return'#'+String(id).padStart(4,'0')}
-function artUrl(id,sh=false){const b='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork';return sh?`${b}/shiny/${id}.png`:`${b}/${id}.png`}
-function smallUrl(id){return`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`}
+// IDs numéricos de formas especiales (Mega, Primal, Coronadas) en PokeAPI
+const FORM_SPRITE_IDS={
+  'venusaur-mega':10033,'charizard-mega-x':10034,'charizard-mega-y':10035,
+  'blastoise-mega':10036,'alakazam-mega':10037,'gengar-mega':10038,
+  'kangaskhan-mega':10039,'pinsir-mega':10040,'gyarados-mega':10041,
+  'aerodactyl-mega':10042,'mewtwo-mega-x':10043,'mewtwo-mega-y':10044,
+  'ampharos-mega':10045,'scizor-mega':10046,'heracross-mega':10047,
+  'houndoom-mega':10048,'tyranitar-mega':10049,'blaziken-mega':10050,
+  'gardevoir-mega':10051,'mawile-mega':10052,'aggron-mega':10053,
+  'medicham-mega':10054,'manectric-mega':10055,'banette-mega':10056,
+  'absol-mega':10057,'garchomp-mega':10058,'lucario-mega':10059,
+  'abomasnow-mega':10060,'kyogre-primal':10061,'groudon-primal':10062,
+  'rayquaza-mega':10063,'slowbro-mega':10064,'steelix-mega':10065,
+  'sceptile-mega':10066,'swampert-mega':10067,'sableye-mega':10068,
+  'sharpedo-mega':10069,'camerupt-mega':10070,'altaria-mega':10071,
+  'glalie-mega':10072,'salamence-mega':10073,'metagross-mega':10074,
+  'latias-mega':10075,'latios-mega':10076,'lopunny-mega':10077,
+  'gallade-mega':10078,'audino-mega':10079,'diancie-mega':10080,
+  'pidgeot-mega':10081,'beedrill-mega':10082,
+  'zacian-crowned':10286,'zamazenta-crowned':10287,
+};
+function getSpriteId(nameOrId){
+  if(typeof nameOrId==='string'&&FORM_SPRITE_IDS[nameOrId])return FORM_SPRITE_IDS[nameOrId];
+  return nameOrId;
+}
+function artUrl(id,sh=false){const rid=getSpriteId(id);const b='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork';return sh?`${b}/shiny/${rid}.png`:`${b}/${rid}.png`}
+function smallUrl(id){const rid=getSpriteId(id);return`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${rid}.png`}
 function fmtAbil(s){return s.split('-').map(w=>w[0]?.toUpperCase()+w.slice(1)).join(' ')}
 
 // ── ABILITY SPANISH NAMES ────────────────────────────────────────
@@ -3306,6 +3358,35 @@ function updateAll(){
 
 // Pokemon Spanish name overrides (Gen 8/9 names PokeAPI lacks in ES)
 
+// Sprites del dropdown:
+// - Pokémon normales (ID <= 10000): smallUrl por ID (rápido, correcto)
+// - Formas especiales (ID > 10000): sprite de Pokémon Showdown por NOMBRE
+//   porque sus sprites están indexados por nombre (igual que PokeAPI), no por ID numérico.
+//   Los IDs de forma en PokeAPI/sprites cambian entre versiones y no son confiables.
+function ddPokeSpriteUrl(name, id) {
+  if (typeof id === 'number' && id > 10000) {
+    return `https://play.pokemonshowdown.com/sprites/gen5/${name}.png`;
+  }
+  return smallUrl(id);
+}
+function ddPokeImgError(img, name, id) {
+  img.onerror = null;
+  // Fallback 1: artUrl por ID
+  const artSrc = artUrl(id);
+  if (img.src !== artSrc) {
+    img.src = artSrc;
+    img.onerror = () => {
+      img.onerror = null;
+      // Fallback 2: smallUrl (por si artUrl también falla en formas)
+      const sm = smallUrl(id);
+      if (img.src !== sm) { img.src = sm; img.onerror = () => { img.style.display='none'; }; }
+      else { img.style.display = 'none'; }
+    };
+  } else {
+    img.style.display = 'none';
+  }
+}
+
 function initSearch(s){
   const box=document.getElementById(`sBox${s}`);
   const drop=document.getElementById(`drop${s}`);
@@ -3316,18 +3397,35 @@ function initSearch(s){
     // Normalize spaces to dashes so "iron valiant" matches "iron-valiant"
     const q=raw.replace(/\s+/g,'-');
     // Also match Spanish names and pretty English names
+    // Palabras individuales del query (para búsqueda en orden invertido: "mega feraligatr" → "feraligatr-mega")
+    const rawWords=raw.split(/\s+/);
+    const qWordsRev=rawWords.length>1?[...rawWords].reverse().join('-'):'';
     const hits=gs.pList.filter(p=>{
       if(p.name.includes(q)||String(p.id)===raw)return true;
+      // Orden invertido: "mega feraligatr" encuentra "feraligatr-mega"
+      if(qWordsRev&&p.name.includes(qWordsRev))return true;
       const es=(POKE_ES[p.name]||'').toLowerCase();
       if(es.includes(raw))return true;
       const esNoAccent=es.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
       if(esNoAccent.includes(raw))return true;
       const en=fmtName(p.name).toLowerCase();
       if(en.includes(raw))return true;
+      // Cada palabra del query aparece en el nombre (todas deben estar, en cualquier orden)
+      if(rawWords.length>1&&rawWords.every(w=>p.name.includes(w)||(POKE_ES[p.name]||'').toLowerCase().includes(w)))return true;
       return false;
     }).slice(0,28);
     if(!hits.length){drop.classList.remove('open');return}
-    drop.innerHTML=hits.map(p=>`<div class="dd-item" onclick="selectPokemon('${s}','${p.name}')"><img src="${smallUrl(p.id)}" loading="lazy" onerror="this.style.display='none'"><span>${fmtName(p.name)}</span><span class="dd-num">${padId(p.id)}</span></div>`).join('');
+    // Also inject mega/primal/crowned forms that match the query
+    const formHits=Object.keys(FORM_SPRITE_IDS).filter(fn=>{
+      const fq=(fn+' '+(POKE_ES[fn]||'')+' '+(fmtName(fn)||'')).toLowerCase();
+      if(fq.includes(q)||fq.includes(raw))return true;
+      if(qWordsRev&&fq.includes(qWordsRev))return true;
+      if(rawWords.length>1&&rawWords.every(w=>fq.includes(w)))return true;
+      return false;
+    }).map(fn=>({name:fn,id:FORM_SPRITE_IDS[fn]}));
+    const allHits=[...hits,...formHits.filter(f=>!hits.find(h=>h.name===f.name))].slice(0,32);
+    // Showdown sprites para formas (nombre-indexados), smallUrl para normales
+    drop.innerHTML=allHits.map(p=>`<div class="dd-item" onclick="selectPokemon('${s}','${p.name}')"><img src="${ddPokeSpriteUrl(p.name,p.id)}" loading="lazy" onerror="ddPokeImgError(this,'${p.name}',${p.id})"><span>${fmtName(p.name)}</span><span class="dd-num">${padId(p.id)}</span></div>`).join('');
     drop.classList.add('open');
   });
   document.addEventListener('click',e=>{if(!e.target.closest('.s-wrap'))drop.classList.remove('open')},{passive:true});
