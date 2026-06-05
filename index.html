@@ -192,18 +192,18 @@ body{background:var(--bg);background-image:radial-gradient(ellipse 1200px 380px 
 .item-dd-label{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .item-dd-arrow{font-size:.6rem;color:var(--tdim);flex-shrink:0;transition:transform .2s}
 .item-dd.open .item-dd-arrow{transform:rotate(180deg)}
-.item-dd-drop{display:none;position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--card);border:1px solid var(--border);border-radius:6px;z-index:9999;box-shadow:0 6px 20px rgba(0,0,0,.5);overflow:hidden}
+.item-dd-drop{display:none;position:absolute;top:calc(100% + 3px);left:0;right:0;min-width:min(100vw - 2rem, 320px);background:var(--card);border:1px solid var(--border);border-radius:6px;z-index:9999;box-shadow:0 6px 20px rgba(0,0,0,.5);overflow:hidden}
 .item-dd.open .item-dd-drop{display:flex;flex-direction:column}
 .item-dd-search-wrap{padding:.35rem .4rem;border-bottom:1px solid var(--border)}
 .item-dd-search{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:5px;color:var(--thi);font-family:'Exo 2',sans-serif;font-size:.76rem;padding:.25rem .4rem;outline:none;box-sizing:border-box}
 .item-dd-search:focus{border-color:var(--gold)}
-.item-dd-list{max-height:220px;overflow-y:auto;overflow-x:hidden}
+.item-dd-list{max-height:220px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 .item-dd-list::-webkit-scrollbar{width:5px}
 .item-dd-list::-webkit-scrollbar-track{background:var(--card)}
 .item-dd-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 .item-dd-optgroup{padding:.2rem .4rem .1rem;font-size:.55rem;font-family:'Press Start 2P',monospace;color:var(--tdim);letter-spacing:.5px;border-top:1px solid var(--border);margin-top:.2rem}
 .item-dd-optgroup:first-child{border-top:none;margin-top:0}
-.item-dd-option{display:flex;align-items:center;gap:.4rem;padding:.28rem .45rem;cursor:pointer;font-size:.8rem;font-family:'Exo 2',sans-serif;color:var(--thi);transition:background .1s;white-space:nowrap}
+.item-dd-option{display:flex;align-items:center;gap:.4rem;padding:.28rem .45rem;cursor:pointer;font-size:.8rem;font-family:'Exo 2',sans-serif;color:var(--thi);transition:background .1s;white-space:normal;word-break:break-word}
 .item-dd-option:hover{background:rgba(255,255,255,.07)}
 .item-dd-option.selected{background:rgba(255,215,0,.08);color:var(--gold)}
 .item-dd-option img{width:24px;height:24px;image-rendering:pixelated;flex-shrink:0}
@@ -247,6 +247,7 @@ body{background:var(--bg);background-image:radial-gradient(ellipse 1200px 380px 
 .mv-cat{font-size:.62rem;color:var(--tdim)}
 .mv-bp{font-family:'Orbitron',monospace;font-size:.62rem;color:var(--tdim)}
 .mv-prio{font-size:.6rem;color:#aaa}
+.mv-desc{font-size:.62rem;color:var(--tdim);line-height:1.38;margin-top:.25rem;width:100%;padding-top:.22rem;border-top:1px solid rgba(255,255,255,.045);font-style:italic;letter-spacing:.01em}
 .mv-clear{position:absolute;top:.3rem;right:.4rem;cursor:pointer;color:var(--tdim);font-size:.75rem;line-height:1;opacity:.5;transition:opacity .2s}
 .mv-clear:hover{opacity:1}
 /* En la segunda columna el dropdown se abre hacia la izquierda para no salirse de pantalla */
@@ -284,6 +285,38 @@ body{background:var(--bg);background-image:radial-gradient(ellipse 1200px 380px 
   .mv-cat,.mv-bp,.mv-prio{font-size:.75rem!important}
   /* Botón limpiar más fácil de tocar */
   .mv-clear{font-size:1rem!important;top:.4rem!important;right:.5rem!important;padding:.2rem!important;opacity:.7!important}
+  /* ── Item dropdown mobile fixes ── */
+  /* El dropdown ocupa todo el ancho de la pantalla menos márgenes */
+  .item-dd-drop{
+    position:fixed!important;
+    left:1rem!important;
+    right:1rem!important;
+    width:auto!important;
+    min-width:0!important;
+    max-height:60vh!important;
+    overflow-y:auto!important;
+    z-index:99999!important;
+    border-radius:10px!important;
+    box-shadow:0 8px 32px rgba(0,0,0,.7)!important;
+  }
+  /* Lista más alta para poder desplazarse cómodamente */
+  .item-dd-list{max-height:calc(60vh - 52px)!important}
+  /* Opciones más altas para facilitar el toque con el dedo */
+  .item-dd-option{
+    padding:.5rem .6rem!important;
+    font-size:.88rem!important;
+    white-space:normal!important;
+    word-break:break-word!important;
+    line-height:1.4!important;
+    min-height:40px!important;
+  }
+  .item-dd-option img{width:28px!important;height:28px!important;flex-shrink:0!important}
+  /* Buscador de objetos más alto y legible */
+  .item-dd-search{font-size:1rem!important;padding:.4rem .5rem!important}
+  /* Etiquetas de grupo más visibles */
+  .item-dd-optgroup{font-size:.5rem!important;padding:.3rem .5rem .2rem!important}
+  /* Botón del selector más alto */
+  .item-dd-btn{min-height:36px!important;font-size:.85rem!important}
 }
 
 /* No poke message */
@@ -1188,6 +1221,7 @@ function fmtAbilBilingual(s){
 }
 
 const ABILITY_DESC_CACHE = new Map();
+const MOVE_DESC_CACHE=new Map();
 const ABILITY_NAME_ES_OVERRIDE = {
   'orichalcum-pulse':'Latido Oricalco',
   'hadron-engine':'Motor Hadrónico',
@@ -1535,6 +1569,10 @@ function calcAllStats(){calcFinalStats('A');calcFinalStats('B')}
 const FORM_EXTRA_MOVES={
   'groudon-primal':['heat-crash','heavy-slam','precipice-blades','fire-punch','thunder-punch','stone-edge','earthquake','rock-slide','solar-beam','swords-dance','rest','sleep-talk','protect','substitute','bulk-up','rock-polish','stealth-rock','fire-blast','flamethrower','overheat','eruption','fire-spin','lava-plume','mud-shot','mud-slap','earth-power'],
   'kyogre-primal':['origin-pulse','water-spout','surf','hydro-pump','blizzard','ice-beam','thunder','sheer-cold','calm-mind','rest','sleep-talk','protect','substitute','aqua-ring','water-pulse','muddy-water','ancient-power','icy-wind','hail','rain-dance','amnesia','double-edge'],
+  // Zacian Forma Espada Suprema — Tajo Supremo (behemoth-blade) es exclusivo de esta forma
+  'zacian-crowned':['behemoth-blade','close-combat','play-rough','wild-charge','sacred-sword','slash','iron-head','psycho-cut','swords-dance','protect','substitute','reflect','helping-hand','misty-terrain','moonblast','thunder','psychic','hyper-beam','giga-impact','crunch','bite','heavy-slam','smart-strike','agility','howl'],
+  // Zamazenta Forma Escudo Supremo — Embate Supremo (behemoth-bash) es exclusivo de esta forma
+  'zamazenta-crowned':['behemoth-bash','close-combat','iron-head','wild-charge','play-rough','slash','psycho-cut','body-press','swords-dance','protect','substitute','reflect','helping-hand','misty-terrain','moonblast','thunder','psychic','hyper-beam','giga-impact','crunch','bite','heavy-slam','smart-strike','agility','howl'],
 };
 // ══════════════════════════════════════════════════════════════════
 //  DAMAGE CALCULATION
@@ -2169,8 +2207,8 @@ const MOVE_ES_OVERRIDE={
   'court-change':'Cambio de Cancha','clangorous-soul':'Alma Estridente',
   'body-press':'Plancha Corporal','decorate':'Decorar',
   'drum-beating':'Tamborileo','snap-trap':'Trampa Snap',
-  'pyro-ball':'Bola Ígnea','behemoth-blade':'Espada Behemot',
-  'behemoth-bash':'Colisión Behemot','aura-wheel':'Rueda de Aura',
+  'pyro-ball':'Bola Ígnea','behemoth-blade':'Tajo Supremo',
+  'behemoth-bash':'Embate Supremo','aura-wheel':'Rueda de Aura',
   'breaking-swipe':'Zarpazo Devastador','branch-poke':'Golpe Rama',
   'overdrive':'Sobredrive','apple-acid':'Ácido Manzana',
   'grav-apple':'Manzana Grav','spirit-break':'Quiebre Espiritual',
@@ -2262,6 +2300,180 @@ async function loadMove(slug){
     gs.moveCache.set(slug,mv);
     return mv;
   }catch(e){return null}
+}
+
+// Descripciones en español para movimientos que PokeAPI no tiene traducidos
+const MOVE_DESC_ES_OVERRIDE={
+  // Gen 8 — Galar
+  'behemoth-blade':'El usuario se transforma en una espada gigante para atacar al objetivo. Si este ha alcanzado el estado Dynamax, el daño infligido será el doble.',
+  'behemoth-bash':'El usuario se transforma en un escudo gigante para embestir al objetivo. Si este ha alcanzado el estado Dynamax, el daño infligido será el doble.',
+  'bolt-beak':'El usuario ataca con su poderoso pico cargado de electricidad. Si el usuario actúa antes que el objetivo, el poder del movimiento se duplica.',
+  'fishious-rend':'El usuario muerde al objetivo con sus fauces abisales. Si el usuario actúa antes que el objetivo, el poder del movimiento se duplica.',
+  'court-change':'El usuario lanza una ola de energía que intercambia los efectos de campo activos entre ambos bandos.',
+  'clangorous-soul':'El usuario sacrifica parte de sus PS para subir su Ataque, Defensa, Atq. Esp., Def. Esp. y Velocidad.',
+  'body-press':'El usuario aplasta al objetivo con todo su cuerpo. Cuanto mayor sea la Defensa del usuario, más daño infligirá.',
+  'decorate':'El usuario decora al objetivo con flores y confeti para subir su Ataque y Atq. Esp.',
+  'drum-beating':'El usuario toca su tambor para atacar al objetivo y bajarle la Velocidad.',
+  'snap-trap':'El usuario atrapa al objetivo en una trampa que lo daña durante cuatro o cinco turnos.',
+  'pyro-ball':'El usuario lanza una pelota ardiente para golpear al objetivo. Puede causar quemaduras.',
+  'aura-wheel':'Morpeko ataca para subir su Velocidad. El tipo del movimiento depende de su modo.',
+  'breaking-swipe':'El usuario barre el área con su enorme cola y ataca a todos los rivales. También les baja el Ataque.',
+  'branch-poke':'El usuario ataca al objetivo clavándole una rama.',
+  'overdrive':'El usuario entona un acorde estridente en su guitarra para dañar a los rivales. Puede anular los terrenos.',
+  'apple-acid':'El usuario ataca al objetivo con ácido de manzana agria para bajarle la Def. Esp.',
+  'grav-apple':'El usuario hace caer una manzana desde lo alto para golpear al objetivo. También le baja la Defensa. En gravedad intensa, su poder aumenta.',
+  'spirit-break':'El usuario ataca al objetivo con tanta fuerza que quebranta su espíritu. También le baja el Atq. Esp.',
+  'strange-steam':'El usuario expulsa un vapor misterioso para confundir al objetivo.',
+  'life-dew':'El usuario esparce unas gotas de agua para restaurar sus PS y los de sus aliados.',
+  'obstruct':'El usuario se protege del ataque del objetivo y, si este lo toca, le baja la Defensa dos rangos.',
+  'false-surrender':'El usuario hace una reverencia falsa antes de atacar al objetivo. Este movimiento no falla.',
+  'meteor-assault':'El usuario ataca al objetivo con un puerro gigantesco con toda su fuerza. El usuario no puede moverse en el siguiente turno.',
+  'eternabeam':'El movimiento especial de Eternatus. Lanza un rayo desde el centro de su cuerpo. El usuario no puede moverse en el siguiente turno.',
+  'steel-beam':'El usuario emite un rayo de acero desde su cuerpo. También reduce sus PS.',
+  'expanding-force':'El usuario ataca al objetivo usando su energía psíquica. Si el Terreno Psíquico está activo, el movimiento afecta a todos los rivales y aumenta su poder.',
+  'steel-roller':'El usuario ataca al objetivo mientras gira por el suelo. Destruye cualquier terreno activo.',
+  'scale-shot':'El usuario lanza escamas al objetivo que lo golpean entre dos y cinco veces. Al final, baja la Defensa del usuario pero sube su Velocidad.',
+  'meteor-beam':'El usuario acumula energía cósmica para atacar al objetivo con un potente rayo en el siguiente turno. También sube el Atq. Esp. del usuario.',
+  'shell-side-arm':'El usuario ataca al objetivo con un veneno misterioso. Puede ser un ataque físico o especial dependiendo del objetivo. Puede envenenar al objetivo.',
+  'misty-explosion':'El usuario se autodestruye en el Terreno Vaporoso para atacar a todos los Pokémon que le rodean. En Terreno Vaporoso, su poder aumenta.',
+  'grassy-glide':'El usuario desliza al objetivo por el suelo. En Terreno Gramíneo, este movimiento tiene prioridad.',
+  'rising-voltage':'El usuario ataca al objetivo con una descarga eléctrica. En Campo Eléctrico, su poder se duplica si el objetivo toca el suelo.',
+  'terrain-pulse':'El usuario emite un pulso de energía aprovechando el terreno activo. El tipo y el poder cambian según el terreno.',
+  'skitter-smack':'El usuario ataca al objetivo de improviso para bajarle el Atq. Esp.',
+  'burning-jealousy':'El usuario ataca con una llama de envidia que quema al objetivo si este ha subido alguna estadística en ese turno.',
+  'lash-out':'El usuario desahoga toda su rabia acumulada contra el objetivo. Si alguna de sus estadísticas bajó en ese turno, el daño es el doble.',
+  'poltergeist':'El usuario dirige el ataque del objeto del objetivo contra él. Si el objetivo no lleva objeto, el movimiento falla.',
+  'corrosive-gas':'El usuario empapa a los Pokémon de los alrededores con un gas corrosivo que destruye sus objetos.',
+  'coaching':'El usuario entrena al aliado para subirle el Ataque y la Defensa.',
+  'flip-turn':'El usuario ataca y luego regresa con el equipo de inmediato, permitiendo que salga otro Pokémon.',
+  'triple-axel':'El usuario golpea al objetivo con tres patadas giratorias. El daño aumenta en cada golpe.',
+  'dual-wingbeat':'El usuario golpea al objetivo con sus alas dos veces seguidas.',
+  'scorching-sands':'El usuario lanza arenas ardientes al objetivo. Puede causar quemaduras.',
+  'jungle-healing':'El usuario absorbe la energía de la jungla para curar sus PS y eliminar los estados alterados del usuario y sus aliados.',
+  'wicked-blow':'El usuario domina la oscuridad con su técnica de maestría para asestar un golpe devastador. Este movimiento siempre impacta en el punto crítico.',
+  'surging-strikes':'El usuario golpea al objetivo con tres olas de agua precisas. Este movimiento siempre impacta en el punto crítico.',
+  'thunder-cage':'El usuario atrapa al objetivo en una jaula eléctrica que lo daña durante cuatro o cinco turnos.',
+  'dragon-energy':'El usuario convierte su vitalidad en energía de dragón y la lanza. Cuantos más PS tenga el usuario, más poderoso será.',
+  'freezing-glare':'El usuario lanza una mirada de energía psíquica congelante. Puede congelar al objetivo.',
+  'fiery-wrath':'El usuario transforma su ira en llamas y ataca. Puede hacer que el objetivo retroceda.',
+  'thunderous-kick':'El usuario usa una patada con energía de trueno para atacar al objetivo y bajarle la Defensa.',
+  'glacial-lance':'El usuario ataca a todos los rivales lanzando un témpano enorme.',
+  'astral-barrage':'El usuario envía un fantasmal ataque a todos los rivales.',
+  'eerie-spell':'El usuario ataca al objetivo con poderes sobrenaturales. Si el objetivo tiene PP restantes, pierde tres.',
+  'wring-out':'El usuario exprime al objetivo con gran fuerza. Cuantos más PS tenga el objetivo, más potente será el movimiento.',
+  'max-flare':'Movimiento Dinamax. Crea un Sol durante cinco turnos.',
+  'max-geyser':'Movimiento Dinamax. Crea Lluvia durante cinco turnos.',
+  'max-lightning':'Movimiento Dinamax. Establece el Campo Eléctrico.',
+  'max-overgrowth':'Movimiento Dinamax. Establece el Terreno Gramíneo.',
+  'max-mindstorm':'Movimiento Dinamax. Establece el Terreno Psíquico.',
+  'max-starfall':'Movimiento Dinamax. Establece el Terreno Vaporoso.',
+  'max-steelspike':'Movimiento Dinamax. Sube la Defensa de todos los aliados.',
+  'max-knuckle':'Movimiento Dinamax. Sube el Ataque de todos los aliados.',
+  'max-ooze':'Movimiento Dinamax. Sube el Atq. Esp. de todos los aliados.',
+  'max-airstream':'Movimiento Dinamax. Sube la Velocidad de todos los aliados.',
+  'max-quake':'Movimiento Dinamax. Sube la Def. Esp. de todos los aliados.',
+  'max-hailstorm':'Movimiento Dinamax. Crea Nevada durante cinco turnos.',
+  'max-rockfall':'Movimiento Dinamax. Crea Tormenta de Arena durante cinco turnos.',
+  // Gen 9 — Paldea
+  'collision-course':'El usuario evoluciona hasta convertirse en una máquina y hace un choque demoledor. Si el movimiento es supereficaz, su poder aumenta aún más.',
+  'electro-drift':'El usuario cabalga sobre un campo de energía electromagnética a gran velocidad para embestir al objetivo. Si el movimiento es supereficaz, su poder aumenta aún más.',
+  'shed-tail':'El usuario crea un sustituto con sus PS antes de retirarse para que salga el siguiente Pokémon aliado.',
+  'chilly-reception':'El usuario cuenta un chiste malísimo, pero el frío ambiente hace que empiece a nevar. Luego cambia con el Pokémon aliado.',
+  'tidy-up':'El usuario recoge los pinchos y los sustitutos del campo, y sube su Ataque y Velocidad.',
+  'snowscape':'El usuario levanta una ventisca para cambiar el clima a Nevada durante cinco turnos.',
+  'pounce':'El usuario salta sobre el objetivo para atacarlo y bajarle la Velocidad.',
+  'trailblaze':'El usuario ataca con la hierba del entorno y sube su Velocidad.',
+  'chilling-water':'El usuario lanza agua helada sobre el objetivo para bajarle el Ataque.',
+  'hyper-drill':'El usuario hace girar la punta de su cuerpo para perforar al objetivo. Este movimiento atraviesa los movimientos de protección.',
+  'twin-beam':'El usuario dispara dos rayos de energía mística de sus ojos al objetivo.',
+  'rage-fist':'El usuario ataca con un puño cargado de ira. Cuantas más veces haya recibido daño el usuario, mayor será el poder del movimiento.',
+  'armor-cannon':'El usuario dispara su armadura como un cañón. Baja la Defensa y Def. Esp. del usuario.',
+  'bitter-blade':'El usuario concentra la energía de una espada ardiente para atacar al objetivo y absorber la mitad del daño infligido.',
+  'double-shock':'El usuario descarga toda la electricidad de su cuerpo para golpear al objetivo. El usuario pierde el tipo Eléctrico tras usarlo.',
+  'gigaton-hammer':'El usuario blande un martillo enorme para atacar al objetivo. No puede usarse dos veces seguidas.',
+  'jet-punch':'El usuario lanza un puño relámpago al objetivo con la mayor velocidad posible. Este movimiento tiene prioridad.',
+  'spicy-extract':'El usuario libera un extracto picantísimo que sube al máximo el Ataque del objetivo pero baja al máximo su Defensa.',
+  'spin-out':'El usuario hace girar frenéticamente sus ruedas para atacar al objetivo. Baja en gran medida la Velocidad del usuario.',
+  'population-bomb':'El usuario y sus aliados atacan al objetivo entre uno y diez veces.',
+  'ice-spinner':'El usuario ataca al objetivo con sus pies cubiertos de hielo mientras gira. Destruye cualquier terreno activo.',
+  'glaive-rush':'El usuario se lanza contra el objetivo con toda su fuerza. En el siguiente turno, los ataques no fallan contra el usuario y el daño recibido se duplica.',
+  'revival-blessing':'El usuario invoca una bendición para revivir a un Pokémon aliado debilitado con la mitad de sus PS.',
+  'salt-cure':'El usuario cura sus heridas con sal y las aplica al objetivo. Los tipos Acero y Agua perderán PS cada turno.',
+  'triple-dive':'El usuario ataca al objetivo sumergiéndose tres veces consecutivas.',
+  'mortal-spin':'El usuario ataca con un giro venenoso que elimina los obstáculos que afectan al usuario. También envenena a los rivales adyacentes.',
+  'doodle':'El usuario copia la habilidad del objetivo y se la transmite a sí mismo y a su aliado.',
+  'fillet-away':'El usuario se saca músculo con una navaja para subir al máximo su Ataque, Atq. Esp. y Velocidad a costa de la mitad de sus PS máximos.',
+  'kowtow-cleave':'El usuario hace una reverencia ante el objetivo para ganarse su confianza y luego lo ataca con una hoja. Este movimiento no falla.',
+  'flower-trick':'El usuario lanza un ramo trampa al objetivo. Este movimiento siempre es golpe crítico y nunca falla.',
+  'torch-song':'El usuario canta una canción ardiente para atacar al objetivo. Sube el Atq. Esp. del usuario.',
+  'aqua-step':'El usuario ataca al objetivo con una danza acuática deslumbrante. Sube la Velocidad del usuario.',
+  'raging-bull':'El usuario realiza una embestida taurina cargada de energía. El tipo del movimiento depende de la forma del usuario. Rompe pantallas de luz y Pantalla Especial.',
+  'make-it-rain':'El usuario lanza monedas al objetivo para atacarlo. Baja el Atq. Esp. del usuario. El dinero se recoge tras el combate.',
+  'psyblade':'El usuario parte el campo de fuerza psíquico con una hoja de energía. En Campo Eléctrico, su poder aumenta.',
+  'hydro-steam':'El usuario ataca con vapor de agua ardiente. En Sol, el poder del movimiento no baja y puede aumentar.',
+  'ruination':'El usuario invoca una calamidad para eliminar la mitad de los PS del objetivo.',
+  'tera-blast':'Si el usuario ha usado la Teracristalización, lanza un rayo de energía del tipo Tera. El movimiento usa el estadístico más alto del usuario.',
+  'tera-starstorm':'Terapagos ataca a todos los rivales con rayos estelares. En Forma Cromo, afecta a todos los Pokémon en el campo.',
+  'hard-press':'El usuario sujeta al objetivo con ambos brazos para aplastarlo. Cuantos más PS tenga el objetivo, más potente será el movimiento.',
+  'dragon-cheer':'El usuario anima a su aliado con energía de dragón para subir la probabilidad de golpe crítico.',
+  'alluring-voice':'El usuario emite una voz encantadora para atacar al objetivo. Confunde al objetivo si sus estadísticas subieron en ese turno.',
+  'temper-flare':'La ira hace actuar al usuario. Su poder se duplica si el movimiento anterior del usuario falló.',
+  'supercell-slam':'El usuario se abalanza sobre el objetivo con una carga eléctrica. Si el movimiento falla, el usuario sufre daño.',
+  'psychic-noise':'El usuario ataca al objetivo con ondas de sonido perjudiciales que impiden usar movimientos de recuperación durante dos turnos.',
+  'upper-hand':'El usuario anticipa el ataque del objetivo y golpea antes de que use un movimiento de prioridad. Hace retroceder al objetivo.',
+  'malignant-chain':'El usuario ataca con una cadena venenosa que puede envenenar gravemente al objetivo.',
+  'blood-moon':'El usuario ataca al objetivo con un rayo de luna de sangre. No puede usarse dos veces seguidas.',
+  'fickle-beam':'El usuario dispara un rayo de energía. En ocasiones, el poder del movimiento se duplica.',
+  'burning-bulwark':'El usuario se protege de los ataques con un manto de llamas. Los ataques de contacto queman al atacante.',
+  'thunderclap':'El usuario actúa antes que el objetivo para atacarlo con un rayo. Solo funciona si el objetivo va a atacar en ese turno.',
+  'mighty-cleave':'El usuario ataca al objetivo con una hoja de roca. Este movimiento atraviesa los movimientos de protección.',
+  'tidal-force':'El usuario aprovecha la atracción lunar para atacar a sus rivales y bajarles la Defensa o el Atq. Esp.',
+  'ivy-cudgel':'Ogerpon golpea con su porra de madera. El tipo varía según la máscara que lleve. Siempre impacta en el punto crítico.',
+  'tachyon-cutter':'El usuario lanza unas cuchillas taquiónicas que traspasan el tiempo para atacar al objetivo dos veces. Este movimiento nunca falla.',
+  'icy-wind':'El usuario lanza un aire helado al rival para atacarle. También le baja la Velocidad.',
+  'electroweb':'El usuario atrapa al objetivo lanzando una red eléctrica. También le baja la Velocidad.',
+  'mystical-power':'El usuario invoca un poder místico para atacar al objetivo. También sube el Atq. Esp. del usuario.',
+  'raging-fury':'El usuario libera su ira incontenible y ataca entre dos y tres turnos. El usuario se confunde al terminar.',
+  'wave-crash':'El usuario se envuelve en una ola enorme para aplastar al objetivo. El usuario también recibe daño.',
+  'esper-wing':'El usuario ataca con alas de energía psíquica. Sube la Velocidad del usuario. Tiene mayor probabilidad de golpe crítico.',
+  'bitter-malice':'El usuario ataca al objetivo con una maldad amarga de ultratumba. Baja el Ataque del objetivo.',
+  'shelter':'El usuario endurece su piel para subir su Defensa en gran medida.',
+  'triple-arrows':'El usuario hace un potente taekwondo y lanza tres flechas. Puede hacer retroceder al objetivo y bajarle la Defensa. Siempre impacta en el punto crítico.',
+  'infernal-parade':'El usuario ataca al objetivo con antorchas encendidas. Si el objetivo tiene algún estado alterado, el poder se duplica. Puede causar quemaduras.',
+  'ceaseless-edge':'El usuario utiliza una poderosa técnica de espada para atacar al objetivo y dispersar pinchos en el campo del rival.',
+  'bleakwind-storm':'El usuario ataca a todos los rivales con un viento glacial y ululante. Puede hacer retroceder a los objetivos. Su precisión baja en clima de Sol.',
+  'wildbolt-storm':'El usuario ataca a todos los rivales con un trueno devastador. Puede paralizar a los objetivos. Su precisión baja en clima de Sol.',
+  'sandsear-storm':'El usuario ataca a todos los rivales con un torbellino abrasador de arena. Puede causar quemaduras. Su precisión baja en clima de Sol.',
+  'mountain-gale':'El usuario ataca al objetivo con cubos de hielo gigantes. Puede hacer retroceder al objetivo.',
+  'victory-dance':'El usuario realiza una danza de guerra ancestral para subir su Ataque, Defensa y Velocidad.',
+  'headlong-rush':'El usuario se lanza de cabeza contra el objetivo. Baja la Defensa y la Def. Esp. del usuario.',
+  'barb-barrage':'El usuario lanza una andanada de púas venenosas al objetivo. Si el objetivo ya está envenenado, su poder se duplica. Puede envenenar.',
+  'dire-claw':'El usuario rasguña al objetivo con garras impregnadas de veneno. Puede paralizar, envenenar o dormir al objetivo.',
+  'psyshield-bash':'El usuario envuelve su cuerpo con energía psíquica y embiste al objetivo. Sube la Defensa del usuario.',
+  'power-shift':'El usuario intercambia su Ataque y Defensa.',
+  'stone-axe':'El usuario ataca al objetivo con un hacha de piedra. Dispersa fragmentos de roca que dañan a los Pokémon rivales al entrar en combate.',
+  'springtide-storm':'El usuario ataca a todos los rivales con los vientos de una tormenta de amor. Puede bajar el Ataque de los objetivos. Su precisión baja en clima de Sol.',
+};
+
+async function fetchMoveDescription(slug){
+  if(MOVE_DESC_CACHE.has(slug))return MOVE_DESC_CACHE.get(slug);
+  const req=(async()=>{
+    try{
+      // Override manual en español — prioridad máxima
+      if(MOVE_DESC_ES_OVERRIDE[slug])return MOVE_DESC_ES_OVERRIDE[slug];
+      const r=await fetch(`https://pokeapi.co/api/v2/move/${slug}/`);
+      if(!r.ok)return null;
+      const d=await r.json();
+      // Try Spanish first, then English
+      const esFlavor=(d.flavor_text_entries||[]).find(x=>x.language?.name==='es'&&x.version_group)?.flavor_text
+        ||(d.flavor_text_entries||[]).find(x=>x.language?.name==='es')?.flavor_text;
+      const enFlavor=(d.flavor_text_entries||[]).find(x=>x.language?.name==='en')?.flavor_text;
+      let desc=(esFlavor||enFlavor||'').replace(/\n|\f/g,' ').replace(/\s+/g,' ').trim();
+      return desc||null;
+    }catch(_){return null}
+  })();
+  MOVE_DESC_CACHE.set(slug,req);
+  return req;
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -2419,9 +2631,29 @@ function toggleItemDD(s){
   const dd=document.getElementById(`itemDD${s}`);
   const isOpen=dd.classList.contains('open');
   // close all open item DDs
-  document.querySelectorAll('.item-dd.open').forEach(el=>el.classList.remove('open'));
+  document.querySelectorAll('.item-dd.open').forEach(el=>{
+    el.classList.remove('open');
+    const d=el.querySelector('.item-dd-drop');
+    if(d){d.style.top='';d.style.bottom='';}
+  });
   if(!isOpen){
     dd.classList.add('open');
+    // On mobile (≤600px): position the fixed dropdown below the button
+    const drop=document.getElementById(`itemDrop${s}`);
+    if(drop&&window.innerWidth<=600){
+      const btn=document.getElementById(`itemBtn${s}`);
+      const rect=btn.getBoundingClientRect();
+      const spaceBelow=window.innerHeight-rect.bottom;
+      const spaceAbove=rect.top;
+      // If more space above than below and below < 200px, open upward
+      if(spaceBelow<200&&spaceAbove>spaceBelow){
+        drop.style.bottom=(window.innerHeight-rect.top+6)+'px';
+        drop.style.top='auto';
+      } else {
+        drop.style.top=(rect.bottom+6)+'px';
+        drop.style.bottom='auto';
+      }
+    }
     const search=document.getElementById(`itemSearch${s}`);
     search.value='';
     filterItemDD(s,'');
@@ -2878,10 +3110,17 @@ function updateMoveInfo(s,slot,mv){
   if(!mv){el.innerHTML='<span style="color:var(--tdim);font-size:.7rem">—</span>';return}
   const tc=TC2[mv.type]||{bg:'#888',tx:'#fff'};
   const catColor=CAT_COLOR[mv.category]||'#aaa';
+  const descId=`mvdesc${s}${slot}`;
   el.innerHTML=`<span class="mv-type" style="background:${tc.bg};color:${tc.tx}">${TYPE_ES[mv.type]||mv.type}</span>`+
     `<span class="mv-cat" style="color:${catColor}">${CAT_ES[mv.category]||mv.category}</span>`+
     (mv.power?`<span class="mv-bp">BP:${mv.power}</span>`:'')+
-    (mv.priority&&mv.priority!==0?`<span class="mv-prio">${mv.priority>0?'+':''}${mv.priority}prio</span>`:'');
+    (mv.priority&&mv.priority!==0?`<span class="mv-prio">${mv.priority>0?'+':''}${mv.priority}prio</span>`:'')+
+    `<span class="mv-desc" id="${descId}"></span>`;
+  // Async load description
+  fetchMoveDescription(mv.slug).then(desc=>{
+    const el2=document.getElementById(descId);
+    if(el2&&desc)el2.textContent=desc;
+  });
 }
 
 function clearMove(s,slot){
