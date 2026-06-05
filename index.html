@@ -354,12 +354,34 @@ body{background:var(--bg);background-image:radial-gradient(ellipse 1200px 380px 
 .turn-weight-pow{background:rgba(150,220,70,.2);color:#aaee55;border:1px solid rgba(150,220,70,.6);animation:weightGlow 1.8s ease-in-out infinite;font-size:.7rem;padding:.16rem .55rem}
 /* Heavy Slam / Heat Crash badge — BP por ratio de pesos */
 .turn-heavy-slam{background:rgba(255,90,170,.2);color:#ff77cc;border:1px solid rgba(255,90,170,.6);animation:heavyGlow 1.8s ease-in-out infinite;font-size:.7rem;padding:.16rem .55rem}
+/* Item boost badge — Choice Band, Gemas, Life Orb, etc. */
+.turn-item-boost{background:rgba(255,215,0,.15);color:#ffd700;border:1px solid rgba(255,215,0,.6);animation:itemBoostGlow 1.8s ease-in-out infinite;font-size:.7rem;padding:.16rem .55rem;letter-spacing:.2px}
+/* Tera boost badge */
+.turn-tera-boost{background:rgba(224,128,255,.15);color:#e080ff;border:1px solid rgba(224,128,255,.7);animation:teraBoostGlow 1.8s ease-in-out infinite;font-size:.7rem;padding:.16rem .55rem;letter-spacing:.2px}
+/* PS-based move badge (Reversión, Erupción, Exprimir) */
+.turn-hp-scale{background:rgba(255,80,80,.18);color:#ff6666;border:1px solid rgba(255,80,80,.65);animation:hpScaleGlow 1.8s ease-in-out infinite;font-size:.7rem;padding:.16rem .55rem;letter-spacing:.2px}
+/* Final Gambit badge */
+.turn-final-gambit{background:rgba(255,60,120,.18);color:#ff5599;border:1px solid rgba(255,60,120,.65);animation:finalGambitGlow 1.8s ease-in-out infinite;font-size:.7rem;padding:.16rem .55rem;letter-spacing:.2px}
+/* Status-conditional badge (Fachada, Maldición, Salmuera) */
+.turn-status-cond{background:rgba(180,80,255,.18);color:#cc77ff;border:1px solid rgba(180,80,255,.6);animation:statusCondGlow 1.8s ease-in-out infinite;font-size:.7rem;padding:.16rem .55rem;letter-spacing:.2px}
+.turn-status-cond.inactive{background:rgba(100,100,120,.12);color:#7777aa;border:1px solid rgba(120,120,180,.3);animation:none;font-size:.7rem;padding:.16rem .55rem}
+/* Speed-based badge (Bola Giro, Bola Electro) */
+.turn-speed-scale{background:rgba(250,146,178,.18);color:#fa92b2;border:1px solid rgba(250,146,178,.6);animation:speedScaleGlow 1.8s ease-in-out infinite;font-size:.7rem;padding:.16rem .55rem;letter-spacing:.2px}
+/* Weather-ball badge */
+.turn-weather-ball{background:rgba(100,200,255,.18);color:#7ddcff;border:1px solid rgba(100,200,255,.6);animation:weatherBallGlow 1.8s ease-in-out infinite;font-size:.7rem;padding:.16rem .55rem;letter-spacing:.2px}
 @keyframes prioGlow{0%,100%{box-shadow:0 0 4px rgba(100,220,100,.25)}50%{box-shadow:0 0 14px rgba(100,220,100,.75),0 0 28px rgba(100,220,100,.3)}}
 @keyframes seBoostGlow{0%,100%{box-shadow:0 0 4px rgba(255,140,0,.25)}50%{box-shadow:0 0 14px rgba(255,160,0,.8),0 0 28px rgba(255,130,0,.35)}}
 @keyframes defBoostGlow{0%,100%{box-shadow:0 0 4px rgba(80,200,255,.2)}50%{box-shadow:0 0 14px rgba(80,200,255,.8),0 0 28px rgba(80,200,255,.3)}}
 @keyframes oppAtkGlow{0%,100%{box-shadow:0 0 4px rgba(190,80,255,.2)}50%{box-shadow:0 0 14px rgba(190,80,255,.8),0 0 28px rgba(190,80,255,.3)}}
 @keyframes weightGlow{0%,100%{box-shadow:0 0 4px rgba(150,220,70,.2)}50%{box-shadow:0 0 14px rgba(150,220,70,.8),0 0 28px rgba(150,220,70,.3)}}
 @keyframes heavyGlow{0%,100%{box-shadow:0 0 4px rgba(255,90,170,.2)}50%{box-shadow:0 0 14px rgba(255,90,170,.8),0 0 28px rgba(255,90,170,.3)}}
+@keyframes itemBoostGlow{0%,100%{box-shadow:0 0 4px rgba(255,215,0,.25),0 0 0 1px transparent}50%{box-shadow:0 0 12px rgba(255,215,0,.75),0 0 24px rgba(255,215,0,.3),0 0 0 1px rgba(255,215,0,.2)}}
+@keyframes teraBoostGlow{0%,100%{box-shadow:0 0 4px rgba(224,128,255,.25)}50%{box-shadow:0 0 14px rgba(224,128,255,.85),0 0 28px rgba(200,80,255,.35),0 0 0 1px rgba(224,128,255,.2)}}
+@keyframes hpScaleGlow{0%,100%{box-shadow:0 0 4px rgba(255,80,80,.25)}50%{box-shadow:0 0 14px rgba(255,80,80,.85),0 0 28px rgba(255,80,80,.3)}}
+@keyframes finalGambitGlow{0%,100%{box-shadow:0 0 4px rgba(255,60,120,.25)}50%{box-shadow:0 0 14px rgba(255,60,120,.85),0 0 28px rgba(255,60,120,.3)}}
+@keyframes statusCondGlow{0%,100%{box-shadow:0 0 4px rgba(180,80,255,.25)}50%{box-shadow:0 0 14px rgba(180,80,255,.85),0 0 28px rgba(180,80,255,.3)}}
+@keyframes speedScaleGlow{0%,100%{box-shadow:0 0 4px rgba(250,146,178,.25)}50%{box-shadow:0 0 14px rgba(250,146,178,.85),0 0 28px rgba(250,146,178,.3)}}
+@keyframes weatherBallGlow{0%,100%{box-shadow:0 0 4px rgba(100,200,255,.25)}50%{box-shadow:0 0 14px rgba(100,200,255,.85),0 0 28px rgba(100,200,255,.3)}}
 /* Priority override banner inside speed banner */
 .spd-prio-override{width:100%;margin-top:.55rem;padding:.5rem .9rem;background:rgba(100,220,100,.09);border:1px solid rgba(100,220,100,.4);border-radius:7px;text-align:center;font-size:.74rem;color:#77ee99;line-height:1.6;animation:prioGlow 2.2s ease-in-out infinite}
 .spd-prio-override strong{font-weight:700;font-family:'Orbitron',monospace;font-size:.76rem}
@@ -625,6 +647,24 @@ const ITEMS=[
   {k:'soul-dew',n:'Soul Dew (Lati@s)',g:'Especial',spaMult:1.5,spDefMult:1.5},
   {k:'punching-glove',n:'Punching Glove',g:'Otro',punchDmg:1.1},
   {k:'booster-energy',n:'Booster Energy',g:'Otro'},
+  {k:'normal-gem',n:'Normal Gem',g:'Gema',gemBoost:'normal'},
+  {k:'fire-gem',n:'Fire Gem',g:'Gema',gemBoost:'fire'},
+  {k:'water-gem',n:'Water Gem',g:'Gema',gemBoost:'water'},
+  {k:'electric-gem',n:'Electric Gem',g:'Gema',gemBoost:'electric'},
+  {k:'grass-gem',n:'Grass Gem',g:'Gema',gemBoost:'grass'},
+  {k:'ice-gem',n:'Ice Gem',g:'Gema',gemBoost:'ice'},
+  {k:'fighting-gem',n:'Fighting Gem',g:'Gema',gemBoost:'fighting'},
+  {k:'poison-gem',n:'Poison Gem',g:'Gema',gemBoost:'poison'},
+  {k:'ground-gem',n:'Ground Gem',g:'Gema',gemBoost:'ground'},
+  {k:'flying-gem',n:'Flying Gem',g:'Gema',gemBoost:'flying'},
+  {k:'psychic-gem',n:'Psychic Gem',g:'Gema',gemBoost:'psychic'},
+  {k:'bug-gem',n:'Bug Gem',g:'Gema',gemBoost:'bug'},
+  {k:'rock-gem',n:'Rock Gem',g:'Gema',gemBoost:'rock'},
+  {k:'ghost-gem',n:'Ghost Gem',g:'Gema',gemBoost:'ghost'},
+  {k:'dragon-gem',n:'Dragon Gem',g:'Gema',gemBoost:'dragon'},
+  {k:'dark-gem',n:'Dark Gem',g:'Gema',gemBoost:'dark'},
+  {k:'steel-gem',n:'Steel Gem',g:'Gema',gemBoost:'steel'},
+  {k:'fairy-gem',n:'Fairy Gem',g:'Gema',gemBoost:'fairy'},
   {k:'occa-berry',n:'Occa Berry (vs Fuego)',g:'Bayas',rb:'fire'},
   {k:'passho-berry',n:'Passho Berry (vs Agua)',g:'Bayas',rb:'water'},
   {k:'wacan-berry',n:'Wacan Berry (vs Eléct.)',g:'Bayas',rb:'electric'},
@@ -653,6 +693,7 @@ const ITEM_GROUP_ES={
   Defensivo:'Defensive / Defensivo',
   Especial:'Special / Especial',
   Otro:'Other / Otro',
+  Gema:'Gem / Gema',
   Bayas:'Berries / Bayas',
 };
 
@@ -712,6 +753,24 @@ const ITEM_ES={
   'soul-dew':'Rocío Bondad',
   'punching-glove':'Guante de Boxeo',
   'booster-energy':'Energía Potenciadora',
+  'normal-gem':'Gema Normal',
+  'fire-gem':'Gema Fuego',
+  'water-gem':'Gema Agua',
+  'electric-gem':'Gema Eléctrica',
+  'grass-gem':'Gema Planta',
+  'ice-gem':'Gema Hielo',
+  'fighting-gem':'Gema Lucha',
+  'poison-gem':'Gema Veneno',
+  'ground-gem':'Gema Tierra',
+  'flying-gem':'Gema Volador',
+  'psychic-gem':'Gema Psíquica',
+  'bug-gem':'Gema Bicho',
+  'rock-gem':'Gema Roca',
+  'ghost-gem':'Gema Fantasma',
+  'dragon-gem':'Gema Dragón',
+  'dark-gem':'Gema Siniestra',
+  'steel-gem':'Gema Acero',
+  'fairy-gem':'Gema Hada',
   'occa-berry':'Baya Caoca',
   'passho-berry':'Baya Pasio',
   'wacan-berry':'Baya Wacan',
@@ -1495,6 +1554,7 @@ const SPEC_MOVES={
   'heavy-slam':{heavyslam:true},'heat-crash':{heavyslam:true},
   'eruption':{eruption:true},'water-spout':{eruption:true},
   'reversal':{reversal:true},'flail':{reversal:true},
+  'final-gambit':{finalGambit:true},
   'wring-out':{wringout:true},'crush-grip':{wringout:true},
   'weather-ball':{weatherball:true},
   'bullet-seed':{hits:[2,3,4,5]},'icicle-spear':{hits:[2,3,4,5]},'rock-blast':{hits:[2,3,4,5]},
@@ -1532,6 +1592,14 @@ function calcDmg(atkrSide,defrSide,mv){
     const dmg=sp.fixed==='level'?atkr.level:sp.fixed;
     const hp=defr.finalStats.hp;
     return{rolls:Array(16).fill(dmg),minDmg:dmg,maxDmg:dmg,minPct:+(dmg/hp*100).toFixed(1),maxPct:+(dmg/hp*100).toFixed(1),typeEff:1,eff:'neutral',defHP:hp};
+  }
+
+  // Final Gambit — daño igual a los PS actuales del atacante
+  if(sp.finalGambit){
+    const atkHPpct=(atkr.currentHPPct??100)/100;
+    const dmg=Math.floor(atkr.finalStats.hp*atkHPpct);
+    const hp=defr.finalStats.hp;
+    return{rolls:Array(16).fill(dmg),minDmg:dmg,maxDmg:dmg,minPct:+(dmg/hp*100).toFixed(1),maxPct:+(dmg/hp*100).toFixed(1),typeEff:1,eff:'neutral',defHP:hp,mechLabel:`PS propios ${atkr.currentHPPct??100}% → ${dmg} daño`,isReversal:false,isEruption:false,isWringout:false,isFinalGambit:true};
   }
 
   // ── Active ability considering Mega ──
@@ -1755,6 +1823,7 @@ function calcDmg(atkrSide,defrSide,mv){
   if(aIt.specDmg&&!isPhys)mod*=aIt.specDmg;
   if(aIt.seDmg&&typeEff>1)mod*=aIt.seDmg;
   if(aIt.tb===effType)mod*=1.2;
+  if(aIt.gemBoost===effType)mod*=1.5;
   if(aIt.punchDmg&&PUNCH_MOVES.has(mv.slug))mod*=aIt.punchDmg;
 
   // Attacker ability
@@ -1834,9 +1903,8 @@ function calcDmg(atkrSide,defrSide,mv){
 
   // Compute STAB info for display
   let stabInfo=null;
-  if(stabMult===2.25)stabInfo='STAB ×2.25 (Tera)';
-  else if(stabMult===2)stabInfo='STAB ×2 (Adaptability)';
-  else if(stabMult===1.5)stabInfo='STAB ×1.5';
+  if(stabMult===2)stabInfo='STAB ×2 (Adaptability)';
+  else if(stabMult===1.5&&!atkr.tera)stabInfo='STAB ×1.5';
 
   // Compute weather boost for display
   let weatherInfo=null;
@@ -1851,6 +1919,55 @@ function calcDmg(atkrSide,defrSide,mv){
   // Debug: log weather state when calculating
   if(gs.weather!=='none'){
     console.log('[DmgCalc] weather='+gs.weather+' effType='+effType+' weatherMod='+(w==='rain'&&effType==='water'?1.5:w==='rain'&&effType==='fire'?0.5:w==='sun'&&effType==='fire'?1.5:w==='sun'&&effType==='water'?0.5:1));
+  }
+
+  // Compute item boost info for display badge
+  let itemBoostInfo=null;
+  {
+    const _it=getItem(atkr.item);
+    const _dn=ITEM_ES[_it.k]||_it.n||'';
+    if(_it.k!=='none'){
+      // Gemas y items de tipo: completamente independientes, aplican a físico Y especial
+      if(_it.gemBoost&&_it.gemBoost===effType){
+        itemBoostInfo=`💎 ${_dn} ×1.5`;
+      } else if(_it.tb&&_it.tb===effType){
+        itemBoostInfo=`✨ ${_dn} ×1.2`;
+      } else if(_it.k==='choice-band'&&isPhys){
+        itemBoostInfo=`💪 ${_dn} ×1.5 ATQ`;
+      } else if(_it.k==='choice-specs'&&!isPhys){
+        itemBoostInfo=`🔮 ${_dn} ×1.5 AE`;
+      } else if(_it.k==='life-orb'){
+        itemBoostInfo=`☄️ ${_dn} ×1.3`;
+      } else if(_it.k==='muscle-band'&&isPhys){
+        itemBoostInfo=`💪 ${_dn} ×1.1 Fís.`;
+      } else if(_it.k==='wise-glasses'&&!isPhys){
+        itemBoostInfo=`🔮 ${_dn} ×1.1 Esp.`;
+      } else if(_it.k==='expert-belt'&&typeEff>1){
+        itemBoostInfo=`🥊 ${_dn} ×1.2 SE`;
+      } else if(_it.k==='punching-glove'&&PUNCH_MOVES.has(mv.slug)){
+        itemBoostInfo=`🥊 ${_dn} ×1.1`;
+      }
+    }
+  }
+
+  // Compute tera boost info for display badge
+  let teraBoostInfo=null;
+  if(atkr.tera){
+    const teraType=atkr.teraType;
+    const origHasStab=atkr.poke.types.includes(effType);
+    const teraMatch=teraType===effType;
+    const teraTypeName=TYPE_ES[teraType]||teraType;
+    if(teraMatch&&origHasStab){
+      teraBoostInfo=ab==='adaptability'
+        ?`💎 Tera ${teraTypeName} ×2.25 (STAB orig.+Tera+Adapt.)`
+        :`💎 Tera ${teraTypeName} ×2.25 (STAB orig.+Tera)`;
+    } else if(teraMatch){
+      teraBoostInfo=ab==='adaptability'
+        ?`💎 Tera ${teraTypeName} ×2 (Adaptability)`
+        :`💎 Tera ${teraTypeName} ×1.5`;
+    } else if(origHasStab){
+      teraBoostInfo=`💎 Tera activo — STAB original ×1.5`;
+    }
   }
 
   return{
@@ -1874,6 +1991,20 @@ function calcDmg(atkrSide,defrSide,mv){
     isOppAtk:!!(sp.useOppAtk),
     isWeightPow:!!(sp.weightPow),
     isHeavySlam:!!(sp.heavyslam),
+    isReversal:!!(sp.reversal),
+    isEruption:!!(sp.eruption),
+    isWringout:!!(sp.wringout),
+    isBrine:!!(sp.doubleIfHalfHP),
+    brineTriggered:!!(sp.doubleIfHalfHP&&(defr.currentHPPct??100)<=50),
+    isFacade:!!(sp.doubleStat),
+    facadeTriggered:!!(sp.doubleStat&&atkr.status!=='none'),
+    isHex:!!(sp.doubleIfStatused),
+    hexTriggered:!!(sp.doubleIfStatused&&defr.status!=='none'),
+    isGyroBall:!!(sp.gyroball),
+    isElectroBall:!!(sp.electroball),
+    isWeatherBall:!!(sp.weatherball),
+    itemBoostInfo,
+    teraBoostInfo,
   };
 }
 
@@ -2225,7 +2356,32 @@ function itemSpriteUrl(k){
     'punching-glove':'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHJlY3QgeD0iNCIgeT0iOCIgd2lkdGg9IjE0IiBoZWlnaHQ9IjExIiByeD0iMiIgZmlsbD0iI2U2Mzk0NiIvPjxyZWN0IHg9IjQiIHk9IjgiIHdpZHRoPSIxNCIgaGVpZ2h0PSI0IiByeD0iMSIgZmlsbD0iI2MxMTIxZiIvPjxyZWN0IHg9IjYiIHk9IjYiIHdpZHRoPSIxMCIgaGVpZ2h0PSI0IiByeD0iMiIgZmlsbD0iI2U2Mzk0NiIvPjxyZWN0IHg9IjgiIHk9IjQiIHdpZHRoPSI2IiBoZWlnaHQ9IjQiIHJ4PSIyIiBmaWxsPSIjYzExMjFmIi8+PHJlY3QgeD0iNSIgeT0iMTIiIHdpZHRoPSIzIiBoZWlnaHQ9IjUiIHJ4PSIxIiBmaWxsPSIjYzExMjFmIi8+PHJlY3QgeD0iMTAiIHk9IjEyIiB3aWR0aD0iMyIgaGVpZ2h0PSI1IiByeD0iMSIgZmlsbD0iI2MxMTIxZiIvPjxyZWN0IHg9IjE1IiB5PSIxMiIgd2lkdGg9IjIiIGhlaWdodD0iNSIgcng9IjEiIGZpbGw9IiNjMTEyMWYiLz48L3N2Zz4=',
     'booster-energy':'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHJlY3QgeD0iNyIgeT0iMyIgd2lkdGg9IjEwIiBoZWlnaHQ9IjE2IiByeD0iMiIgZmlsbD0iI2Y0YTI2MSIvPjxyZWN0IHg9IjciIHk9IjMiIHdpZHRoPSIxMCIgaGVpZ2h0PSI1IiByeD0iMiIgZmlsbD0iI2U3NmY1MSIvPjxwb2x5Z29uIHBvaW50cz0iMTIsNiA5LDEzIDExLjUsMTMgMTAsMTkgMTUsMTEgMTIuNSwxMSIgZmlsbD0iI2ZmZTA2NiIvPjxyZWN0IHg9IjkiIHk9IjE4IiB3aWR0aD0iNiIgaGVpZ2h0PSIyIiByeD0iMSIgZmlsbD0iI2FkYjViZCIvPjwvc3ZnPg==',
   };
+  // Gem SVG fallbacks (for gems missing from PokeAPI sprites repo)
+  function gemSvg(color){
+    return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><polygon points="16,3 26,10 26,22 16,29 6,22 6,10" fill="${color}" opacity="0.9"/><polygon points="16,3 26,10 16,13 6,10" fill="white" opacity="0.35"/><polygon points="16,13 26,10 26,22 16,29 6,22 6,10" fill="${color}"/><polygon points="16,13 16,29 26,22" fill="${color}" filter="brightness(0.8)"/></svg>`)}`;
+  }
+  const GEM_SVG_FALLBACK={
+    'normal-gem':gemSvg('#A8A878'),
+    'fire-gem':gemSvg('#F08030'),
+    'water-gem':gemSvg('#6890F0'),
+    'electric-gem':gemSvg('#F8D030'),
+    'grass-gem':gemSvg('#78C850'),
+    'ice-gem':gemSvg('#98D8D8'),
+    'fighting-gem':gemSvg('#C03028'),
+    'poison-gem':gemSvg('#A040A0'),
+    'ground-gem':gemSvg('#E0C068'),
+    'flying-gem':gemSvg('#A890F0'),
+    'psychic-gem':gemSvg('#F85888'),
+    'bug-gem':gemSvg('#A8B820'),
+    'rock-gem':gemSvg('#B8A038'),
+    'ghost-gem':gemSvg('#705898'),
+    'dragon-gem':gemSvg('#7038F8'),
+    'dark-gem':gemSvg('#705848'),
+    'steel-gem':gemSvg('#B8B8D0'),
+    'fairy-gem':gemSvg('#EE99AC'),
+  };
   if(GEN9_SPRITES[k])return GEN9_SPRITES[k];
+  if(GEM_SVG_FALLBACK[k])return GEM_SVG_FALLBACK[k];
   return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${k}.png`;
 }
 
@@ -2656,9 +2812,13 @@ function initMoveSearch(s){
     if(!box||!drop)return;
 
     function renderMoveDropdown(q){
-      const sorted=getSortedMoves(s,sd.pokeMoves,q).slice(0,120);
-      if(!sorted.length){drop.classList.remove('open');return}
       const mode=gs[`moveSort${s}`]||'default';
+      const hasQuery=!!(q||'').trim();
+      // Only limit results when the user is actively searching with text.
+      // When browsing by type or category we need ALL moves so no groups disappear.
+      const limit=hasQuery?120:(mode==='type'||mode==='category')?9999:120;
+      const sorted=getSortedMoves(s,sd.pokeMoves,q).slice(0,limit);
+      if(!sorted.length){drop.classList.remove('open');return}
       if(mode==='type'){
         // Group by type with headers
         const groups={};
@@ -2853,6 +3013,18 @@ function renderMoveResult(mv,res,num,atkSide){
       ${res.isOppAtk?`<span class="turn-badge turn-opp-atk">😈 USA ATQ del RIVAL</span>`:''}
       ${res.isWeightPow?`<span class="turn-badge turn-weight-pow">⚖️ BP por PESO rival${res.mechLabel?` (${res.mechLabel})`:''}</span>`:''}
       ${res.isHeavySlam?`<span class="turn-badge turn-heavy-slam">🏋️ BP por RATIO de PESOS${res.mechLabel?` (${res.mechLabel})`:''}</span>`:''}
+      ${res.isReversal?`<span class="turn-badge turn-hp-scale">❤️ BP por PS propios${res.mechLabel?` (${res.mechLabel})`:''}</span>`:''}
+      ${res.isEruption?`<span class="turn-badge turn-hp-scale">🌋 BP por PS propios${res.mechLabel?` (${res.mechLabel})`:''}</span>`:''}
+      ${res.isWringout?`<span class="turn-badge turn-hp-scale">💧 BP por PS rival${res.mechLabel?` (${res.mechLabel})`:''}</span>`:''}
+      ${res.isFinalGambit?`<span class="turn-badge turn-final-gambit">💀 Último Sacrificio${res.mechLabel?` (${res.mechLabel})`:''}</span>`:''}
+      ${res.isBrine?res.brineTriggered?`<span class="turn-badge turn-status-cond">🧂 Salmuera BP×2 (rival ≤50% PS)</span>`:`<span class="turn-badge turn-status-cond inactive">🧂 Salmuera — rival >50% PS</span>`:''}
+      ${res.isFacade?res.facadeTriggered?`<span class="turn-badge turn-status-cond">🔥 Fachada BP×2 (estado activo)</span>`:`<span class="turn-badge turn-status-cond inactive">🔥 Fachada — sin estado</span>`:''}
+      ${res.isHex?res.hexTriggered?`<span class="turn-badge turn-status-cond">👻 Maldición BP×2 (rival con estado)</span>`:`<span class="turn-badge turn-status-cond inactive">👻 Maldición — rival sin estado</span>`:''}
+      ${res.isGyroBall?`<span class="turn-badge turn-speed-scale">⚙️ Bola Giro${res.mechLabel?` (${res.mechLabel})`:''}</span>`:''}
+      ${res.isElectroBall?`<span class="turn-badge turn-speed-scale">⚡ Bola Electro${res.mechLabel?` (${res.mechLabel})`:''}</span>`:''}
+      ${res.isWeatherBall?`<span class="turn-badge turn-weather-ball">🌤️ Bola Clima${res.mechLabel?` → tipo ${TYPE_ES[mv.type]||mv.type} BP:${res.bp}`:''}</span>`:''}
+      ${res.itemBoostInfo?`<span class="turn-badge turn-item-boost">${res.itemBoostInfo}</span>`:''}
+      ${res.teraBoostInfo?`<span class="turn-badge turn-tera-boost">${res.teraBoostInfo}</span>`:''}
       ${effBadge}
       ${res.stabInfo?`<span class="badge-stab">⭐ ${res.stabInfo}</span>`:''}
       ${res.weatherInfo&&!res.weatherInfo.includes('0.5')?`<span class="badge-weather-boost">${res.weatherInfo}</span>`:''}
