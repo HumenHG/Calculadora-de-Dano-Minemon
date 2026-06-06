@@ -342,6 +342,35 @@
         color: var(--rb);
         border: 1px solid rgba(26, 68, 204, 0.3);
       }
+      .pnl-hdr {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+      }
+      .btn-clear-poke {
+        display: none;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.2rem 0.55rem;
+        border-radius: 5px;
+        border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.05);
+        color: var(--tdim);
+        font-family: "Exo 2", sans-serif;
+        font-size: 0.65rem;
+        cursor: pointer;
+        transition: border-color 0.2s, color 0.2s, background 0.2s;
+        user-select: none;
+      }
+      .btn-clear-poke.visible {
+        display: flex;
+      }
+      .btn-clear-poke:hover {
+        border-color: rgba(204,32,32,0.5);
+        color: #ff7070;
+        background: rgba(204,32,32,0.12);
+      }
 
       /* Search */
       .s-wrap {
@@ -1036,8 +1065,15 @@
         position: relative;
         overflow: visible;
       }
+      .mv-input-row {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
       .mv-s-wrap {
         position: relative;
+        flex: 1;
+        min-width: 0;
       }
       .mv-s-box {
         width: 100%;
@@ -1125,18 +1161,26 @@
         letter-spacing: 0.01em;
       }
       .mv-clear {
-        position: absolute;
-        top: 0.3rem;
-        right: 0.4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: rgba(204, 32, 32, 0.18);
+        border: 1px solid rgba(204, 32, 32, 0.35);
+        color: #cc4444;
+        font-size: 0.6rem;
         cursor: pointer;
-        color: var(--tdim);
-        font-size: 0.75rem;
+        flex-shrink: 0;
+        transition: background 0.15s, border-color 0.15s, color 0.15s;
+        user-select: none;
         line-height: 1;
-        opacity: 0.5;
-        transition: opacity 0.2s;
       }
       .mv-clear:hover {
-        opacity: 1;
+        background: rgba(204, 32, 32, 0.45);
+        border-color: #cc2020;
+        color: #ff6666;
       }
       /* En la segunda columna el dropdown se abre hacia la izquierda para no salirse de pantalla */
       .moves-grid > .move-slot:nth-child(even) .mv-dropdown {
@@ -1204,13 +1248,11 @@
         .mv-prio {
           font-size: 0.75rem !important;
         }
-        /* Botón limpiar más fácil de tocar */
+        /* Botón limpiar — ya es parte del flex row, solo ajustar tamaño */
         .mv-clear {
-          font-size: 1rem !important;
-          top: 0.4rem !important;
-          right: 0.5rem !important;
-          padding: 0.2rem !important;
-          opacity: 0.7 !important;
+          width: 28px !important;
+          height: 28px !important;
+          font-size: 0.75rem !important;
         }
         /* ── Config + Item dropdown mobile fixes ── */
         /* En móvil las 2 columnas se apilan para que el desplegable
@@ -7812,7 +7854,10 @@
       function buildPanel(s) {
         const isA = s === "A";
         document.getElementById(`panel${s}`).innerHTML = `
-    <div class="pnl-badge ${isA ? "a" : "b"}">${isA ? "⚔️ POKÉMON A" : "⚔️ POKÉMON B"}</div>
+    <div class="pnl-hdr">
+      <div class="pnl-badge ${isA ? "a" : "b"}">${isA ? "⚔️ POKÉMON A" : "⚔️ POKÉMON B"}</div>
+      <button class="btn-clear-poke" id="clearPokeBtn${s}" onclick="clearPokemon('${s}')" title="Limpiar Pokémon">✕ Limpiar</button>
+    </div>
     <div class="s-wrap"><span class="s-ico">🔍</span><input class="s-box" id="sBox${s}" placeholder="Buscar Pokémon..." autocomplete="off" spellcheck="false"><div class="dropdown" id="drop${s}"></div></div>
     <div class="top-row">
       <div class="sprite-area">
@@ -7875,8 +7920,10 @@
         .map(
           (i) => `
       <div class="move-slot" id="mslot${s}${i}">
-        <span class="mv-clear" onclick="clearMove('${s}',${i})">✕</span>
-        <div class="mv-s-wrap"><input class="mv-s-box" id="mbox${s}${i}" placeholder="Mov. ${i + 1}…" autocomplete="off"><div class="mv-dropdown" id="mdrop${s}${i}"></div></div>
+        <div class="mv-input-row">
+          <div class="mv-s-wrap"><input class="mv-s-box" id="mbox${s}${i}" placeholder="Mov. ${i + 1}…" autocomplete="off"><div class="mv-dropdown" id="mdrop${s}${i}"></div></div>
+          <span class="mv-clear" onclick="clearMove('${s}',${i})" title="Borrar movimiento">✕</span>
+        </div>
         <div class="mv-info" id="minfo${s}${i}"><span style="color:var(--tdim);font-size:.7rem">—</span></div>
       </div>`,
         )
@@ -8240,6 +8287,8 @@
       // ══════════════════════════════════════════════════════════════════
       function updatePanelSprite(s) {
         const sd = gs[s];
+        const btn = document.getElementById(`clearPokeBtn${s}`);
+        if (btn) btn.classList.toggle("visible", !!sd.poke);
         if (!sd.poke) return;
         const img = document.getElementById(`img${s}`);
         const ph = document.getElementById(`ph${s}`);
@@ -8258,6 +8307,19 @@
           ring.classList.add("active");
         };
         img.src = url;
+      }
+
+      function clearPokemon(s) {
+        // Reset this side to a blank state
+        const prev = gs[s];
+        gs[s] = mkSide();
+        gs[s].level = prev.level; // keep level preference
+        // Re-build the panel UI
+        buildPanel(s);
+        setLevel(s, gs[s].level);
+        checkAutoConditions();
+        buildDmgZone();
+        updateAll();
       }
       function calcTypeMatchups(types, ability) {
         // For each attacking type, compute effectiveness vs this pokemon's types
