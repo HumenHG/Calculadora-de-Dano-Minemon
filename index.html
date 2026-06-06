@@ -4,20 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MINEMON — Simulador de Daño</title>
+    <!-- Fuentes: preload para evitar FOUT, no bloquean render -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap">
     <link
       href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap"
       rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
     />
-    <script
-      type="text/javascript"
-      src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=WwWfVfD1UpstMArBftkAhIQHdGuRQ6k_l8mm0Mw_V-PXmNqph2ryzx5LYZTkd-Q8cOGYrPPxoC2pqAHCgbvrxs5-juXF2lteNGg4FiRFnjW-S3pX8u5soG5u_y69GKVNxlZBJq4nmxVb_mlMHZXzjGqCfm8ltGhQziOx0iQ13J4lu40qka8N3JztYIRAPLGjQWE82i6BXc18P0pzOblFbdj3TAh9ouFkoPYxFfeilRyKy9Gl40sF2dCiogOfqzVkhtbblN0v-Nxp_6AcFJHEI-zk-ggqxh0t2HJQPGeJTLsvwJRTurSm6OeXLcA-JIQcRftMcDuk5_vVo8v-JQOGflL_F1kCLgO6FN2s0n9xwVw"
-      charset="UTF-8"
-    ></script>
-    <script
-      type="text/javascript"
-      src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=gGyF9ak0JVvjWqGrBBSgTgFKa_syGQbfDwJVqa48JkYWyIbMqAunTzj_swfYB8H_GXyP51MCYgzv02SfbKlsSS-D2wiYDIQiCJU9eRoIAH51LA46kOOs6W0thHK0QPxu2uxzWdVe6ibX1x4oPQZGOvDSulTXPky11JHIhHRoKESz6YKl3j1BUtSJcOF7V-hKjaj-oRevLUcpzyxceMj7_RepRzh1OVGLUfZ335QwrhpzmXkCRdr-IUXTcw26GbXT-5yZ18XoWaQcmE25_8eI6AK9DHldiG-MSYzzbtSm9UH62VzXWuoPjmOKgVgh5ba1jI9iqangvNv2MdmhplQ-CagDIxDHma3guleXiviY_7E"
-      charset="UTF-8"
-    ></script>
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap"></noscript>
+    <!-- Scripts de extensión de Kaspersky eliminados (bloqueaban el render) -->
     <style>
       *,
       *::before,
@@ -69,6 +67,18 @@
         color: var(--text);
         font-family: "Exo 2", sans-serif;
         min-height: 100vh;
+        overflow-x: hidden; /* previene scroll horizontal por dropdowns */
+      }
+      /* Móvil: eliminar grid de fondo (ahorra repaint en dispositivos lentos) */
+      @media (max-width: 600px) {
+        body {
+          background-image: radial-gradient(
+            ellipse 800px 300px at 50% 0,
+            rgba(0, 140, 70, 0.15) 0%,
+            transparent 62%
+          );
+          background-size: auto;
+        }
       }
       ::-webkit-scrollbar {
         width: 5px;
@@ -1149,10 +1159,20 @@
           font-size: 1rem !important;
           padding: 0.45rem 0.6rem !important;
         }
-        /* Dropdown más alto y legible */
+        /* ── CLAVE: el dropdown se ajusta exactamente al ancho del slot ──
+           min-width/width:max-content causaban overflow de pantalla */
         .mv-dropdown {
-          max-height: 300px !important;
+          min-width: 0 !important;
+          width: 100% !important;
+          max-width: 100% !important;
+          max-height: 50vh !important;
           border-radius: 8px !important;
+          box-sizing: border-box !important;
+        }
+        /* El slot de columna par ya no necesita abrir hacia la derecha */
+        .moves-grid > .move-slot:nth-child(even) .mv-dropdown {
+          left: 0 !important;
+          right: 0 !important;
         }
         /* Filas del dropdown más altas y con texto que no se corta */
         .mv-dd-item {
@@ -1694,6 +1714,16 @@
         color: #7ddcff;
         border: 1px solid rgba(100, 200, 255, 0.6);
         animation: weatherBallGlow 1.8s ease-in-out infinite;
+        font-size: 0.7rem;
+        padding: 0.16rem 0.55rem;
+        letter-spacing: 0.2px;
+      }
+      /* Ability damage boost badge */
+      .turn-ability-boost {
+        background: rgba(120, 220, 255, 0.18);
+        color: #8fe7ff;
+        border: 1px solid rgba(120, 220, 255, 0.6);
+        animation: itemBoostGlow 1.8s ease-in-out infinite;
         font-size: 0.7rem;
         padding: 0.16rem 0.55rem;
         letter-spacing: 0.2px;
@@ -3726,6 +3756,123 @@
           },
           ability: "trace",
         },
+        // ── Nuevas Mega Evoluciones de Legends: Z-A ─────────────────────
+        // Estas entradas permiten usar base + botón Mega además del slug -mega directo
+        clefable: {
+          base: { hp: 95, attack: 80, defense: 93, "special-attack": 135, "special-defense": 110, speed: 70 },
+          ability: "magic-bounce",
+          types: ["fairy", "flying"],
+        },
+        victreebel: {
+          base: { hp: 80, attack: 125, defense: 85, "special-attack": 135, "special-defense": 95, speed: 70 },
+          ability: "innards-out",
+          types: ["grass", "poison"],
+        },
+        starmie: {
+          base: { hp: 60, attack: 140, defense: 105, "special-attack": 130, "special-defense": 105, speed: 120 },
+          ability: "huge-power",
+          types: ["water", "psychic"],
+        },
+        dragonite: {
+          base: { hp: 91, attack: 124, defense: 115, "special-attack": 145, "special-defense": 125, speed: 100 },
+          ability: "multiscale",
+          types: ["dragon", "flying"],
+        },
+        meganium: {
+          base: { hp: 80, attack: 92, defense: 115, "special-attack": 143, "special-defense": 115, speed: 80 },
+          ability: "mega-sol",
+          types: ["grass", "fairy"],
+        },
+        feraligatr: {
+          base: { hp: 85, attack: 160, defense: 125, "special-attack": 89, "special-defense": 93, speed: 78 },
+          ability: "dragonize",
+          types: ["water", "dragon"],
+        },
+        skarmory: {
+          base: { hp: 65, attack: 140, defense: 110, "special-attack": 40, "special-defense": 100, speed: 110 },
+          ability: "stalwart",
+          types: ["steel", "flying"],
+        },
+        chimecho: {
+          base: { hp: 75, attack: 50, defense: 110, "special-attack": 135, "special-defense": 120, speed: 65 },
+          ability: "levitate",
+          types: ["psychic", "steel"],
+        },
+        froslass: {
+          base: { hp: 70, attack: 80, defense: 70, "special-attack": 140, "special-defense": 100, speed: 120 },
+          ability: "snow-warning",
+          types: ["ice", "ghost"],
+        },
+        emboar: {
+          base: { hp: 110, attack: 148, defense: 75, "special-attack": 110, "special-defense": 110, speed: 75 },
+          ability: "mold-breaker",
+          types: ["fire", "fighting"],
+        },
+        excadrill: {
+          base: { hp: 110, attack: 165, defense: 100, "special-attack": 65, "special-defense": 65, speed: 103 },
+          ability: "piercing-drill",
+          types: ["ground", "steel"],
+        },
+        chandelure: {
+          base: { hp: 60, attack: 75, defense: 110, "special-attack": 175, "special-defense": 110, speed: 90 },
+          ability: "infiltrator",
+          types: ["ghost", "fire"],
+        },
+        golurk: {
+          base: { hp: 89, attack: 159, defense: 105, "special-attack": 70, "special-defense": 105, speed: 55 },
+          ability: "unseen-fist",
+          types: ["ground", "ghost"],
+        },
+        chesnaught: {
+          base: { hp: 88, attack: 137, defense: 172, "special-attack": 74, "special-defense": 115, speed: 44 },
+          ability: "bulletproof",
+          types: ["grass", "fighting"],
+        },
+        delphox: {
+          base: { hp: 75, attack: 69, defense: 72, "special-attack": 159, "special-defense": 125, speed: 134 },
+          ability: "levitate",
+          types: ["fire", "psychic"],
+        },
+        greninja: {
+          base: { hp: 72, attack: 125, defense: 77, "special-attack": 133, "special-defense": 81, speed: 142 },
+          ability: "protean",
+          types: ["water", "dark"],
+        },
+        floette: {
+          base: { hp: 74, attack: 85, defense: 87, "special-attack": 155, "special-defense": 148, speed: 102 },
+          ability: "fairy-aura",
+          types: ["fairy"],
+        },
+        meowstic: {
+          base: { hp: 74, attack: 48, defense: 76, "special-attack": 143, "special-defense": 101, speed: 124 },
+          ability: "trace",
+          types: ["psychic"],
+        },
+        hawlucha: {
+          base: { hp: 78, attack: 137, defense: 100, "special-attack": 74, "special-defense": 93, speed: 118 },
+          ability: "no-guard",
+          types: ["fighting", "flying"],
+        },
+        crabominable: {
+          base: { hp: 97, attack: 157, defense: 122, "special-attack": 62, "special-defense": 107, speed: 33 },
+          ability: "iron-fist",
+          types: ["fighting", "ice"],
+        },
+        drampa: {
+          base: { hp: 78, attack: 85, defense: 110, "special-attack": 160, "special-defense": 116, speed: 36 },
+          ability: "berserk",
+          types: ["normal", "dragon"],
+        },
+        scovillain: {
+          base: { hp: 65, attack: 138, defense: 85, "special-attack": 138, "special-defense": 85, speed: 75 },
+          ability: "spicy-spray",
+          types: ["grass", "fire"],
+        },
+        glimmora: {
+          base: { hp: 83, attack: 90, defense: 105, "special-attack": 150, "special-defense": 96, speed: 101 },
+          ability: "adaptability",
+          types: ["rock", "poison"],
+        },
       };
 
       // ── DYNAMAX HP multiplier ────────────────────────────────────────
@@ -4278,6 +4425,30 @@
         "diancie-mega": "Diancie Mega",
         "pidgeot-mega": "Pidgeot Mega",
         "beedrill-mega": "Beedrill Mega",
+        // ── Nuevas Mega Evoluciones de Legends: Z-A ──────────────────────
+        "clefable-mega": "Clefable Mega",
+        "victreebel-mega": "Victreebel Mega",
+        "starmie-mega": "Starmie Mega",
+        "dragonite-mega": "Dragonite Mega",
+        "meganium-mega": "Meganium Mega",
+        "feraligatr-mega": "Feraligatr Mega",
+        "skarmory-mega": "Skarmory Mega",
+        "chimecho-mega": "Chimecho Mega",
+        "froslass-mega": "Froslass Mega",
+        "emboar-mega": "Emboar Mega",
+        "excadrill-mega": "Excadrill Mega",
+        "chandelure-mega": "Chandelure Mega",
+        "golurk-mega": "Golurk Mega",
+        "chesnaught-mega": "Chesnaught Mega",
+        "delphox-mega": "Delphox Mega",
+        "greninja-mega": "Greninja Mega",
+        "floette-mega": "Floette Mega",
+        "meowstic-mega": "Meowstic Mega",
+        "hawlucha-mega": "Hawlucha Mega",
+        "crabominable-mega": "Crabominable Mega",
+        "drampa-mega": "Drampa Mega",
+        "scovillain-mega": "Scovillain Mega",
+        "glimmora-mega": "Glimmora Mega",
         "zacian-crowned": "Zacian Espada Suprema",
         "zamazenta-crowned": "Zamazenta Escudo Supremo",
       };
@@ -4357,6 +4528,30 @@
         "diancie-mega": 10080,
         "pidgeot-mega": 10081,
         "beedrill-mega": 10082,
+        // ── Nuevas Mega Evoluciones de Legends: Z-A (se usan los IDs base mientras PokeAPI no tenga los sprites) ──
+        "clefable-mega": 36,
+        "victreebel-mega": 71,
+        "starmie-mega": 121,
+        "dragonite-mega": 149,
+        "meganium-mega": 154,
+        "feraligatr-mega": 160,
+        "froslass-mega": 478,
+        "skarmory-mega": 227,
+        "chimecho-mega": 358,
+        "emboar-mega": 500,
+        "excadrill-mega": 530,
+        "chandelure-mega": 609,
+        "golurk-mega": 623,
+        "chesnaught-mega": 652,
+        "delphox-mega": 655,
+        "greninja-mega": 658,
+        "floette-mega": 670,
+        "meowstic-mega": 678,
+        "hawlucha-mega": 701,
+        "crabominable-mega": 740,
+        "drampa-mega": 780,
+        "scovillain-mega": 953,
+        "glimmora-mega": 970,
         "zacian-crowned": 10286,
         "zamazenta-crowned": 10287,
       };
@@ -4450,6 +4645,7 @@
         filter: "Filtro",
         "flame-body": "Cuerpo Llama",
         "flare-boost": "Impulso Ígnea",
+        "toxic-boost": "Impulso Tóxico",
         "flash-fire": "Absorbe Fuego",
         "flower-gift": "Regalo Floral",
         "flower-veil": "Velo Floral",
@@ -4662,6 +4858,11 @@
         blaze: "Llamarada",
         torrent: "Torrente",
         swarm: "Enjambre",
+        // ── Nuevas habilidades exclusivas de Mega Z-A ──
+        "mega-sol": "Mega Sol",
+        "spicy-spray": "Rociada Picante",
+        "piercing-drill": "Taladro Perforador",
+        "innards-out": "Vísceras al Aire",
       };
 
       function fmtAbilBilingual(s) {
@@ -4677,6 +4878,10 @@
         "orichalcum-pulse": "Latido Oricalco",
         "hadron-engine": "Motor Hadrónico",
         dragonize: "Piel Dragontina",
+        "mega-sol": "Mega Sol",
+        "spicy-spray": "Rociada Picante",
+        "piercing-drill": "Taladro Perforador",
+        "innards-out": "Vísceras al Aire",
       };
       const ABILITY_DESC_ES_OVERRIDE = {
         "orichalcum-pulse":
@@ -4685,6 +4890,18 @@
           "Crea un Campo Eléctrico cuando el Pokémon entra en combate. Bajo Campo Eléctrico, también aumenta su Ataque Especial.",
         dragonize:
           "Los movimientos de tipo Normal del Pokémon se convierten en movimientos de tipo Dragón y su potencia aumenta un 20%.",
+        "mega-sol":
+          "El Pokémon usa los movimientos como si el clima fuera sol intenso, aunque no haya sol activo en el campo.",
+        "spicy-spray":
+          "El Pokémon que golpee a este Pokémon con un movimiento de contacto queda quemado.",
+        "piercing-drill":
+          "Los movimientos de contacto del Pokémon afectan al objetivo aunque esté en estado de protección, infligiendo el 25% del daño normal.",
+        "innards-out":
+          "Cuando este Pokémon cae en combate, inflige al adversario daño equivalente a sus PS restantes en ese momento.",
+        "intrepid-sword":
+          "Al entrar en combate, el Ataque del Pokémon sube un rango. Este efecto no ocurre si el Pokémon ya fue enviado a combate antes en la misma batalla.",
+        "dauntless-shield":
+          "Al entrar en combate, la Defensa del Pokémon sube un rango. Este efecto no ocurre si el Pokémon ya fue enviado a combate antes en la misma batalla.",
       };
       const ABILITY_TEXT_TRANSLATION_CACHE = new Map();
 
@@ -4717,6 +4934,10 @@
             ABILITY_DESC_ES_OVERRIDE["orichalcum-pulse"],
           "Turns the ground into Electric Terrain when the Pokémon enters battle. The futuristic engine within the Pokémon also boosts its Sp. Atk stat on Electric Terrain.":
             ABILITY_DESC_ES_OVERRIDE["hadron-engine"],
+          "Boosts the Pokémon's Attack stat when it enters a battle.":
+            ABILITY_DESC_ES_OVERRIDE["intrepid-sword"],
+          "The Pokémon's unassailable determination boosts its Defense stat when it enters a battle.":
+            ABILITY_DESC_ES_OVERRIDE["dauntless-shield"],
         };
         if (exact[out]) return exact[out];
 
@@ -4807,6 +5028,9 @@
           };
         }
         if (ABILITY_DESC_CACHE.has(ab)) return ABILITY_DESC_CACHE.get(ab);
+        // Check persistent cache
+        const lsAb = lsGet(`ab:${ab}`);
+        if (lsAb) { ABILITY_DESC_CACHE.set(ab, lsAb); return lsAb; }
         const req = (async () => {
           try {
             const res = await fetch(`https://pokeapi.co/api/v2/ability/${ab}/`);
@@ -4870,7 +5094,9 @@
 
             if (!desc)
               desc = "No hay descripción disponible para esta habilidad.";
-            return { name, desc };
+            const result = { name, desc };
+            lsSet(`ab:${ab}`, result);
+            return result;
           } catch (err) {
             const fallbackDesc =
               ABILITY_DESC_ES_OVERRIDE[ab] ||
@@ -4979,6 +5205,13 @@
           "pure-power": { attack: "×2 Atq" },
           hustle: { attack: "×1.5 Atq" },
           "gorilla-tactics": { attack: "×1.5 Atq" },
+          "intrepid-sword": { attack: "⚔️ +1 Atq" },
+          "dauntless-shield": { defense: "🛡️ +1 Def" },
+          defeatist: {
+            attack: "😰 ×0.5 Atq (≤50% PS)",
+            "special-attack": "😰 ×0.5 AE (≤50% PS)",
+          },
+          "water-bubble": { attack: "🫧 ×2 mov.Agua" },
           "swift-swim": { speed: w === "rain" ? "☔ ×2 Vel" : "" },
           chlorophyll: { speed: w === "sun" ? "☀️ ×2 Vel" : "" },
           "sand-rush": { speed: w === "sand" ? "🌪️ ×2 Vel" : "" },
@@ -5061,6 +5294,7 @@
               stat = Math.floor(stat * 2);
             if (["hustle", "gorilla-tactics"].includes(ab))
               stat = Math.floor(stat * 1.5);
+            if (ab === "intrepid-sword") stat = Math.floor(stat * 1.5);
             if (ab === "guts" && st !== "none") stat = Math.floor(stat * 1.5);
             if (ab === "orichalcum-pulse" && w === "sun")
               stat = Math.floor((stat * 4) / 3);
@@ -5069,6 +5303,8 @@
             if (ab === "flower-gift" && w === "sun")
               stat = Math.floor(stat * 1.5);
             if (ab === "defeatist" && sd.finalStats.hp > 0 && stat > 0) {
+              const hpPct = sd.currentHPPct ?? 100;
+              if (hpPct <= 50) stat = Math.floor(stat * 0.5);
             }
           }
 
@@ -5078,6 +5314,10 @@
               stat = Math.floor((stat * 4) / 3);
             if (ab === "solar-power" && w === "sun")
               stat = Math.floor(stat * 1.5);
+            if (ab === "defeatist") {
+              const hpPct = sd.currentHPPct ?? 100;
+              if (hpPct <= 50) stat = Math.floor(stat * 0.5);
+            }
             if (
               ab === "protosynthesis" &&
               isParadoxActive(sd, ab, w, t) &&
@@ -5095,6 +5335,7 @@
           if (k === "defense") {
             if (it.defMult) stat = Math.floor(stat * it.defMult);
             if (ab === "fur-coat") stat = Math.floor(stat * 2);
+            if (ab === "dauntless-shield") stat = Math.floor(stat * 1.5);
             if (ab === "marvel-scale" && st !== "none")
               stat = Math.floor(stat * 1.5);
             if (ab === "grass-pelt" && t === "grassy")
@@ -5258,7 +5499,483 @@
           "agility",
           "howl",
         ],
+        // ── Mega Evoluciones de Legends: Z-A — Movepools completos ──────────
+        "floette-mega": [
+          // Fairy ofensivo (Fairy Aura boosted)
+          "moonblast", "dazzling-gleam", "draining-kiss", "play-rough",
+          "light-of-ruin", "fairy-wind", "misty-explosion",
+          // Psíquico / cobertura
+          "stored-power", "psychic", "psyshock", "shadow-ball", "hyper-voice",
+          // Planta
+          "petal-dance", "petal-blizzard", "energy-ball", "magical-leaf",
+          "solar-beam", "grass-knot", "trailblaze",
+          // Soporte / estado
+          "calm-mind", "wish", "synthesis", "aromatherapy", "heal-bell",
+          "misty-terrain", "charm", "encore", "disable", "helping-hand",
+          "reflect", "light-screen", "thunder-wave", "toxic", "attract",
+          "protect", "substitute", "rest", "sleep-talk",
+        ],
+        "meganium-mega": [
+          // Planta / Hada (Mega-Sol)
+          "solar-beam", "energy-ball", "petal-blizzard", "petal-dance",
+          "moonblast", "dazzling-gleam", "magical-leaf", "grass-knot",
+          "trailblaze", "weather-ball",
+          // Soporte
+          "synthesis", "leech-seed", "aromatherapy", "heal-bell",
+          "reflect", "light-screen", "safeguard", "sweet-scent",
+          "dragon-tail", "body-slam", "hyper-voice",
+          "calm-mind", "toxic", "protect", "substitute",
+          "wish", "healing-wish", "rest", "sleep-talk",
+        ],
+        "feraligatr-mega": [
+          // Agua / cobertura
+          "waterfall", "liquidation", "aqua-jet", "surf", "hydro-pump",
+          "crunch", "ice-punch", "ice-fang", "dragon-claw", "outrage",
+          "scale-shot", "close-combat", "low-kick", "superpower",
+          "rock-slide", "earthquake",
+          // NORMAL ofensivos → DRAGÓN con Dragonize (×1.2 + STAB)
+          "double-edge", "giga-impact", "hyper-beam", "body-slam",
+          "thrash", "slash", "chip-away", "facade",
+          "extreme-speed", "headbutt",
+          // Estado
+          "swords-dance", "dragon-dance", "scary-face", "rain-dance",
+          "protect", "substitute", "rest", "sleep-talk",
+        ],
+        "froslass-mega": [
+          // Hielo
+          "blizzard", "ice-beam", "freeze-dry", "icy-wind",
+          "ice-shard", "avalanche", "powder-snow", "snowscape",
+          // Fantasma
+          "shadow-ball", "hex", "will-o-wisp", "destiny-bond",
+          "shadow-sneak", "ominous-wind", "never-ending-nightmare",
+          // Cobertura
+          "thunderbolt", "thunder", "psychic", "dazzling-gleam",
+          // Soporte / estado
+          "spikes", "calm-mind", "taunt", "confuse-ray",
+          "trick", "disable", "imprison", "protect", "substitute",
+          "rest", "sleep-talk",
+        ],
+        "emboar-mega": [
+          // Fuego / Lucha (Reckless)
+          "flare-blitz", "blast-burn", "flamethrower", "fire-blast",
+          "overheat", "heat-wave", "heat-crash",
+          "close-combat", "superpower", "hammer-arm", "arm-thrust",
+          "drain-punch", "brick-break", "low-kick", "focus-blast",
+          // Cobertura
+          "wild-charge", "thunder-punch", "ice-punch", "head-smash",
+          "earthquake", "rock-slide", "stone-edge",
+          "heavy-slam", "bulldoze", "stomping-tantrum",
+          "body-slam", "facade", "taunt",
+          // Estado
+          "bulk-up", "protect", "substitute", "rest", "sleep-talk",
+        ],
+        "chesnaught-mega": [
+          // Planta
+          "wood-hammer", "power-whip", "leaf-storm", "energy-ball",
+          "solar-beam", "seed-bomb", "grass-knot", "synthesis",
+          "leech-seed", "spiky-shield",
+          // Lucha
+          "close-combat", "drain-punch", "mach-punch", "hammer-arm",
+          "low-kick", "low-sweep", "body-press", "brick-break",
+          // Cobertura
+          "earthquake", "rock-slide", "stone-edge", "shadow-claw",
+          "stomping-tantrum", "bulldoze", "pin-missile",
+          // Soporte
+          "bulk-up", "stealth-rock", "spikes", "toxic",
+          "super-fang", "protect", "substitute", "rest", "sleep-talk",
+        ],
+        "delphox-mega": [
+          // Fuego / Psíquico (Magician)
+          "fire-blast", "flamethrower", "overheat", "heat-wave",
+          "mystical-fire", "fire-spin", "blast-burn",
+          "psychic", "psyshock", "expanding-force", "stored-power",
+          "future-sight", "extrasensory",
+          // Cobertura
+          "shadow-ball", "dazzling-gleam", "focus-blast",
+          "hyper-voice", "energy-ball", "grass-knot",
+          // Soporte / estado
+          "nasty-plot", "calm-mind", "will-o-wisp", "hypnosis",
+          "light-screen", "reflect", "trick", "sunny-day",
+          "thunder-wave", "protect", "substitute", "rest", "sleep-talk",
+        ],
+        "greninja-mega": [
+          // Agua
+          "water-shuriken", "hydro-pump", "surf", "liquidation", "scald",
+          "aqua-jet", "waterfall", "hydro-cannon",
+          // Siniestro
+          "dark-pulse", "night-slash", "foul-play", "shadow-sneak",
+          // Hielo
+          "ice-beam", "blizzard", "ice-punch", "icy-wind",
+          // Cobertura
+          "shadow-ball", "extrasensory", "thunderbolt", "thunder",
+          "grass-knot", "gunk-shot", "u-turn", "aerial-ace",
+          "acrobatics", "bounce", "low-kick", "rock-slide", "brick-break",
+          // Soporte
+          "spikes", "toxic-spikes", "taunt", "mat-block",
+          "smokescreen", "haze", "protect", "substitute",
+        ],
+        "clefable-mega": [
+          // Hada (Magic Guard)
+          "moonblast", "dazzling-gleam", "play-rough",
+          "draining-kiss", "disarming-voice", "misty-explosion",
+          // Cobertura
+          "stored-power", "psychic", "shadow-ball", "focus-blast",
+          "flamethrower", "fire-blast", "ice-beam", "thunderbolt",
+          "grass-knot", "magical-leaf",
+          // Soporte / utilidad
+          "cosmic-power", "calm-mind", "soft-boiled", "recover",
+          "stealth-rock", "wish", "heal-bell", "aromatherapy",
+          "thunder-wave", "gravity", "reflect", "light-screen",
+          "healing-wish", "follow-me", "helping-hand", "encore",
+          "charm", "minimize", "sing", "teleport", "metronome",
+          "knock-off", "toxic", "protect", "substitute",
+          "rest", "sleep-talk",
+        ],
+        "victreebel-mega": [
+          // Planta
+          "leaf-blade", "power-whip", "leaf-storm", "razor-leaf",
+          "magical-leaf", "trailblaze", "energy-ball", "solar-beam",
+          "petal-blizzard", "grass-knot", "growth", "synthesis",
+          // Veneno
+          "sludge-bomb", "gunk-shot", "acid-spray", "venoshock",
+          "toxic", "poison-powder", "stun-spore",
+          // Siniestro / cobertura
+          "sucker-punch", "knock-off", "wring-out", "weather-ball",
+          // Estado / trampa
+          "sleep-powder", "leech-seed", "sweet-scent", "ingrain",
+          "gastro-acid", "worry-seed", "encore",
+          "destiny-bond", "stockpile", "swords-dance",
+          "protect", "substitute",
+        ],
+        "dragonite-mega": [
+          // Dragón
+          "outrage", "draco-meteor", "dragon-pulse", "dragon-rush",
+          "dragon-claw", "dragon-dance",
+          // Volador
+          "hurricane", "fly", "aerial-ace", "steel-wing",
+          // Normal → ventaja con Dragonize en base
+          "extreme-speed", "body-slam", "hyper-beam", "giga-impact",
+          // Fuego / Eléctrico / Hielo
+          "fire-blast", "fire-punch", "flamethrower",
+          "thunder", "thunderbolt", "thunder-punch",
+          "ice-beam", "blizzard", "ice-punch",
+          // Agua / Tierra / Lucha
+          "aqua-tail", "surf", "waterfall", "earthquake",
+          "superpower", "iron-head", "iron-tail", "rock-slide", "brick-break",
+          // Soporte
+          "roost", "protect", "substitute", "rest", "sleep-talk", "agility",
+        ],
+        "starmie-mega": [
+          // Agua (Huge Power → físico relevante)
+          "surf", "hydro-pump", "scald", "water-pulse",
+          "aqua-tail", "waterfall", "rapid-spin",
+          // Psíquico
+          "psychic", "psyshock", "future-sight", "expanding-force",
+          "reflect-type", "cosmic-power", "zen-headbutt",
+          // Eléctrico / Hielo
+          "thunderbolt", "thunder", "thunder-wave",
+          "ice-beam", "blizzard", "icy-wind", "aurora-beam",
+          // Cobertura
+          "dazzling-gleam", "power-gem", "grass-knot",
+          "signal-beam", "swift", "gravity",
+          // Soporte
+          "recover", "agility", "confuse-ray", "trick",
+          "light-screen", "protect", "substitute",
+          "rest", "sleep-talk",
+        ],
+        "skarmory-mega": [
+          // Volador / Acero
+          "brave-bird", "aerial-ace", "air-slash", "hurricane",
+          "drill-peck", "sky-attack",
+          "iron-head", "flash-cannon", "steel-wing", "body-press",
+          // Soporte / defensivo
+          "spikes", "stealth-rock", "roost", "whirlwind",
+          "iron-defense", "metal-sound", "agility", "taunt",
+          "swords-dance",
+          // Cobertura
+          "rock-slide", "stone-edge", "night-slash", "dark-pulse",
+          // Estado
+          "toxic", "thunder-wave", "protect", "substitute",
+          "rest", "sleep-talk",
+        ],
+        "chimecho-mega": [
+          // Psíquico (Levitate)
+          "psychic", "psyshock", "extrasensory", "expanding-force",
+          "stored-power", "future-sight", "signal-beam",
+          // Cobertura
+          "flash-cannon", "shadow-ball", "dazzling-gleam",
+          "energy-ball", "icy-wind",
+          // Soporte especial
+          "hyper-voice", "round", "echoed-voice",
+          "heal-bell", "wish", "recover", "healing-wish",
+          "light-screen", "reflect", "safeguard",
+          "trick-room", "guard-split", "power-split",
+          // Estado / utilidad
+          "calm-mind", "iron-defense", "yawn", "confuse-ray",
+          "hypnosis", "thunder-wave", "trick", "teleport",
+          "helping-hand", "protect", "substitute",
+          "rest", "sleep-talk",
+        ],
+        "excadrill-mega": [
+          // Tierra / Acero
+          "earthquake", "high-horsepower", "drill-run",
+          "stomping-tantrum", "bulldoze", "scorching-sands",
+          "iron-head", "iron-tail", "metal-claw", "smart-strike",
+          "flash-cannon",
+          // Cobertura
+          "rock-slide", "stone-edge", "x-scissor",
+          "shadow-claw", "brick-break",
+          // Soporte
+          "swords-dance", "hone-claws", "rapid-spin",
+          "stealth-rock", "metal-sound", "body-press",
+          "toxic", "protect", "substitute",
+          "rest", "sleep-talk",
+        ],
+        "chandelure-mega": [
+          // Fantasma / Fuego (Shadow Tag)
+          "shadow-ball", "poltergeist", "phantom-force", "hex",
+          "will-o-wisp", "flamethrower", "fire-blast", "overheat",
+          "heat-wave", "inferno", "fire-spin",
+          // Cobertura
+          "energy-ball", "psychic", "dazzling-gleam", "focus-blast",
+          // Soporte
+          "destiny-bond", "imprison", "pain-split", "memento",
+          "trick-room", "trick", "confuse-ray", "hypnosis",
+          "taunt", "toxic", "clear-smog", "calm-mind",
+          "protect", "substitute", "rest", "sleep-talk",
+        ],
+        "golurk-mega": [
+          // Tierra / Fantasma (No Guard)
+          "earthquake", "high-horsepower", "stomping-tantrum",
+          "shadow-punch", "poltergeist", "phantom-force", "shadow-ball",
+          "shadow-claw", "hex", "will-o-wisp",
+          // Puñetazos (No Guard + dynamic-punch = 100% confusión)
+          "dynamic-punch", "drain-punch", "hammer-arm",
+          "ice-punch", "thunder-punch", "fire-punch", "focus-blast",
+          // Cobertura
+          "iron-head", "stone-edge", "rock-slide", "fly",
+          "heavy-slam", "body-press",
+          // Soporte
+          "stealth-rock", "gravity", "curse", "bulk-up",
+          "protect", "substitute", "rest", "sleep-talk",
+        ],
+        "meowstic-mega": [
+          // Psíquico (Prankster / Competitive)
+          "psychic", "psyshock", "expanding-force", "stored-power",
+          "future-sight", "signal-beam", "extrasensory",
+          // Cobertura
+          "shadow-ball", "dark-pulse", "thunderbolt",
+          "dazzling-gleam", "disarming-voice", "energy-ball",
+          "hyper-voice",
+          // Soporte
+          "calm-mind", "nasty-plot", "trick-room", "trick",
+          "taunt", "thunder-wave", "reflect", "light-screen",
+          "charm", "yawn", "quick-attack", "agility",
+          "teleport", "protect", "substitute",
+          "rest", "sleep-talk",
+        ],
+        "hawlucha-mega": [
+          // Volador / Lucha (Unburden)
+          "high-jump-kick", "close-combat", "drain-punch",
+          "mach-punch", "power-up-punch", "brick-break",
+          "low-kick", "low-sweep", "focus-punch",
+          "sky-attack", "aerial-ace", "acrobatics",
+          "bounce", "u-turn",
+          // Cobertura
+          "thunder-punch", "iron-head", "stone-edge", "rock-slide",
+          "sky-uppercut", "shadow-claw",
+          // Soporte / utilidad
+          "swords-dance", "bulk-up", "hone-claws", "encore",
+          "taunt", "feather-dance", "quick-attack",
+          "fake-out", "agility", "roost",
+          "protect", "substitute", "rest", "sleep-talk",
+        ],
+        "crabominable-mega": [
+          // Hielo (Iron Fist)
+          "icicle-crash", "ice-hammer", "ice-punch", "ice-shard",
+          "icicle-spear", "blizzard", "ice-beam", "icy-wind",
+          "avalanche", "powder-snow", "freeze-dry",
+          // Lucha
+          "close-combat", "dynamic-punch", "drain-punch",
+          "mach-punch", "superpower", "hammer-arm",
+          "brick-break", "focus-blast",
+          // Cobertura
+          "rock-slide", "stone-edge", "earthquake",
+          "body-slam", "scary-face",
+          // Estado
+          "bulk-up", "focus-energy", "agility",
+          "protect", "substitute", "rest", "sleep-talk",
+        ],
+        "drampa-mega": [
+          // Dragón (Berserk → SpA sube al recibir daño)
+          "draco-meteor", "dragon-pulse", "outrage", "dragon-tail",
+          "dragonbreath", "dragon-dance",
+          // Normal de alto poder (con Berserk, las oleadas especiales son devastadoras)
+          "boomburst", "hyper-voice", "body-slam",
+          "hyper-beam", "giga-impact",
+          // Fuego / Eléctrico / Hielo / Agua
+          "flamethrower", "fire-blast", "heat-wave", "overheat",
+          "thunderbolt", "thunder",
+          "ice-beam", "blizzard", "icy-wind",
+          "surf", "hydro-pump",
+          // Cobertura especial
+          "psychic", "extrasensory", "focus-blast",
+          "shadow-ball", "dazzling-gleam",
+          // Estado
+          "noble-roar", "scary-face", "glare", "yawn",
+          "calm-mind", "protect", "substitute",
+          "rest", "sleep-talk",
+        ],
+        "scovillain-mega": [
+          // Planta / Fuego
+          "leaf-storm", "petal-blizzard", "petal-dance",
+          "energy-ball", "solar-beam", "solar-blade",
+          "magical-leaf", "trailblaze", "seed-bomb", "grass-knot",
+          "flamethrower", "fire-blast", "overheat", "heat-wave",
+          "burning-jealousy", "fire-spin", "weather-ball",
+          // Soporte
+          "growth", "swords-dance", "synthesis",
+          "will-o-wisp", "leech-seed", "sweet-scent",
+          "sleep-powder", "spore", "grassy-terrain",
+          "sunny-day", "protect", "substitute",
+          "rest", "sleep-talk",
+        ],
+        "glimmora-mega": [
+          // Roca / Veneno (Toxic Debris)
+          "power-gem", "rock-blast", "stone-edge", "flash-cannon",
+          "sludge-bomb", "sludge-wave", "venoshock",
+          "earth-power", "giga-drain", "energy-ball",
+          "dazzling-gleam", "hex", "icy-wind",
+          // Trampas / soporte
+          "toxic-spikes", "spikes", "stealth-rock", "sticky-web",
+          "mortal-spin", "acid-spray", "clear-smog",
+          "cosmic-power", "rock-polish",
+          // Estado
+          "toxic", "protect", "substitute", "recover",
+          "rest", "sleep-talk",
+        ],
       };
+
+      // ── Datos estáticos para Mega Evoluciones Z-A no disponibles en PokeAPI ───
+      // Se usan como fallback cuando la petición a PokeAPI devuelve 404
+      const ZA_MEGA_POKEMON = {
+        "floette-mega": {
+          id: 670, types: ["fairy"],
+          base: { hp: 74, attack: 85, defense: 87, "special-attack": 155, "special-defense": 148, speed: 102 },
+          abilities: ["fairy-aura"], weight: 100.8,
+        },
+        "meganium-mega": {
+          id: 154, types: ["grass", "fairy"],
+          base: { hp: 80, attack: 92, defense: 115, "special-attack": 143, "special-defense": 115, speed: 80 },
+          abilities: ["mega-sol"], weight: 100.5,
+        },
+        "feraligatr-mega": {
+          id: 160, types: ["water", "dragon"],
+          base: { hp: 85, attack: 160, defense: 125, "special-attack": 89, "special-defense": 93, speed: 78 },
+          abilities: ["dragonize"], weight: 88.8,
+        },
+        "froslass-mega": {
+          id: 478, types: ["ice", "ghost"],
+          base: { hp: 70, attack: 80, defense: 70, "special-attack": 140, "special-defense": 100, speed: 120 },
+          abilities: ["snow-warning"], weight: 26.6,
+        },
+        "emboar-mega": {
+          id: 500, types: ["fire", "fighting"],
+          base: { hp: 110, attack: 148, defense: 75, "special-attack": 110, "special-defense": 110, speed: 75 },
+          abilities: ["mold-breaker"], weight: 150.0,
+        },
+        "chesnaught-mega": {
+          id: 652, types: ["grass", "fighting"],
+          base: { hp: 88, attack: 137, defense: 172, "special-attack": 74, "special-defense": 115, speed: 44 },
+          abilities: ["bulletproof"], weight: 90.0,
+        },
+        "delphox-mega": {
+          id: 655, types: ["fire", "psychic"],
+          base: { hp: 75, attack: 69, defense: 72, "special-attack": 159, "special-defense": 125, speed: 134 },
+          abilities: ["levitate"], weight: 39.0,
+        },
+        "greninja-mega": {
+          id: 658, types: ["water", "dark"],
+          base: { hp: 72, attack: 125, defense: 77, "special-attack": 133, "special-defense": 81, speed: 142 },
+          abilities: ["protean"], weight: 40.0,
+        },
+        "clefable-mega": {
+          id: 36, types: ["fairy", "flying"],
+          base: { hp: 95, attack: 80, defense: 93, "special-attack": 135, "special-defense": 110, speed: 70 },
+          abilities: ["magic-bounce"], weight: 40.0,
+        },
+        "victreebel-mega": {
+          id: 71, types: ["grass", "poison"],
+          base: { hp: 80, attack: 125, defense: 85, "special-attack": 135, "special-defense": 95, speed: 70 },
+          abilities: ["innards-out"], weight: 15.5,
+        },
+        "starmie-mega": {
+          id: 121, types: ["water", "psychic"],
+          base: { hp: 60, attack: 140, defense: 105, "special-attack": 130, "special-defense": 105, speed: 120 },
+          abilities: ["huge-power"], weight: 80.0,
+        },
+        "dragonite-mega": {
+          id: 149, types: ["dragon", "flying"],
+          base: { hp: 91, attack: 124, defense: 115, "special-attack": 145, "special-defense": 125, speed: 100 },
+          abilities: ["multiscale"], weight: 210.0,
+        },
+        "skarmory-mega": {
+          id: 227, types: ["steel", "flying"],
+          base: { hp: 65, attack: 140, defense: 110, "special-attack": 40, "special-defense": 100, speed: 110 },
+          abilities: ["stalwart"], weight: 50.5,
+        },
+        "chimecho-mega": {
+          id: 358, types: ["psychic", "steel"],
+          base: { hp: 75, attack: 50, defense: 110, "special-attack": 135, "special-defense": 120, speed: 65 },
+          abilities: ["levitate"], weight: 1.0,
+        },
+        "excadrill-mega": {
+          id: 530, types: ["ground", "steel"],
+          base: { hp: 110, attack: 165, defense: 100, "special-attack": 65, "special-defense": 65, speed: 103 },
+          abilities: ["piercing-drill"], weight: 40.4,
+        },
+        "chandelure-mega": {
+          id: 609, types: ["ghost", "fire"],
+          base: { hp: 60, attack: 75, defense: 110, "special-attack": 175, "special-defense": 110, speed: 90 },
+          abilities: ["infiltrator"], weight: 34.3,
+        },
+        "golurk-mega": {
+          id: 623, types: ["ground", "ghost"],
+          base: { hp: 89, attack: 159, defense: 105, "special-attack": 70, "special-defense": 105, speed: 55 },
+          abilities: ["unseen-fist"], weight: 330.0,
+        },
+        "meowstic-mega": {
+          id: 678, types: ["psychic"],
+          base: { hp: 74, attack: 48, defense: 76, "special-attack": 143, "special-defense": 101, speed: 124 },
+          abilities: ["trace"], weight: 8.5,
+        },
+        "hawlucha-mega": {
+          id: 701, types: ["fighting", "flying"],
+          base: { hp: 78, attack: 137, defense: 100, "special-attack": 74, "special-defense": 93, speed: 118 },
+          abilities: ["no-guard"], weight: 21.5,
+        },
+        "crabominable-mega": {
+          id: 740, types: ["fighting", "ice"],
+          base: { hp: 97, attack: 157, defense: 122, "special-attack": 62, "special-defense": 107, speed: 33 },
+          abilities: ["iron-fist"], weight: 180.0,
+        },
+        "drampa-mega": {
+          id: 780, types: ["normal", "dragon"],
+          base: { hp: 78, attack: 85, defense: 110, "special-attack": 160, "special-defense": 116, speed: 36 },
+          abilities: ["berserk"], weight: 185.0,
+        },
+        "scovillain-mega": {
+          id: 953, types: ["grass", "fire"],
+          base: { hp: 65, attack: 138, defense: 85, "special-attack": 138, "special-defense": 85, speed: 75 },
+          abilities: ["spicy-spray"], weight: 15.0,
+        },
+        "glimmora-mega": {
+          id: 970, types: ["rock", "poison"],
+          base: { hp: 83, attack: 90, defense: 105, "special-attack": 150, "special-defense": 96, speed: 101 },
+          abilities: ["adaptability"], weight: 45.0,
+        },
+      };
+
       // ══════════════════════════════════════════════════════════════════
       //  DAMAGE CALCULATION
       // ══════════════════════════════════════════════════════════════════
@@ -5453,6 +6170,134 @@
         return c / rolls.length;
       }
 
+
+      function buildAbilityDamageBadges({
+        atkr,
+        defr,
+        mv,
+        effType,
+        isPhys,
+        bp,
+        typeEff,
+        ab,
+        dAb,
+        weather,
+        terrain,
+        normConv,
+        stabMult,
+        supW,
+      }) {
+        const badges = [];
+        const add = (text) =>
+          badges.push(`<span class="turn-badge turn-ability-boost">${text}</span>`);
+
+        const atkHpPct = atkr.currentHPPct ?? 100;
+        const defHpPct = defr.currentHPPct ?? 100;
+        const pinchActive = atkHpPct <= 33.4;
+        const hasMoldBreaker = ["mold-breaker", "teravolt", "turboblaze"].includes(ab);
+        const effectiveDab = hasMoldBreaker ? "none" : dAb;
+        const auraBroken = ab === "aura-break" || effectiveDab === "aura-break";
+
+        // Field auras
+        if (!auraBroken && effType === "fairy" && (ab === "fairy-aura" || effectiveDab === "fairy-aura")) {
+          add("✨ Aura Hada ×1.33");
+        }
+        if (!auraBroken && effType === "dark" && (ab === "dark-aura" || effectiveDab === "dark-aura")) {
+          add("🌑 Aura Oscura ×1.33");
+        }
+
+        // Type conversion abilities
+        if (normConv) {
+          const pretty = TYPE_ES[effType] || effType;
+          add(`🔁 ${ABILITY_ES[ab] || fmtAbil(ab)} → ${pretty} ×1.2`);
+        }
+        if (ab === "liquid-voice" && SOUND_MOVES.has(mv.slug)) {
+          add(`🎵 Voz Fluida → Agua`);
+        }
+
+        // Mold Breaker family: ignores defender abilities
+        if (hasMoldBreaker && dAb !== "none") {
+          add(`🔨 ${ABILITY_ES[ab] || fmtAbil(ab)}: ignora ${ABILITY_ES[dAb] || dAb}`);
+        }
+        // Scrappy: hits Ghost
+        if (ab === "scrappy" && ["normal","fighting"].includes(effType) && (defr.tera ? [defr.teraType] : defr.poke.types).includes("ghost")) {
+          add(`💥 Combativo: alcanza fantasma`);
+        }
+
+        // Direct damage abilities already applied in the formula
+        if (ab === "technician" && bp <= 60) add("🛠️ Técnico ×1.5");
+        if (ab === "iron-fist" && PUNCH_MOVES.has(mv.slug)) add("👊 Puño Férreo ×1.2");
+        if (ab === "strong-jaw" && BITE_MOVES.has(mv.slug)) add("🦷 Mandíbula Fuerte ×1.5");
+        if (ab === "tough-claws" && CONTACT_MOVES.has(mv.slug)) add("🦴 Garra Dura ×1.3");
+        if (ab === "mega-launcher" && PULSE_MOVES.has(mv.slug)) add("🚀 Megaimpulso ×1.5");
+        if (ab === "punk-rock" && SOUND_MOVES.has(mv.slug)) add("🎵 Rocanrol ×1.3");
+        if (ab === "reckless" && RECOIL_MOVES.has(mv.slug)) add("💥 Audaz ×1.2");
+        if (ab === "sheer-force" && mv.hasSecondary && !atkr.zMove) add("💠 Potencia Bruta ×1.3");
+        if (ab === "sand-force" && weather === "sand" && ["rock", "steel", "ground"].includes(effType))
+          add("🌪️ Fuerza Arena ×1.3");
+        if (ab === "solar-power" && weather === "sun" && !isPhys) add("☀️ Poder Solar ×1.5");
+        if (ab === "transistor" && effType === "electric") add("⚡ Transistor ×1.5");
+        if (ab === "dragons-maw" && effType === "dragon") add("🐉 Mandíbula Dragón ×1.5");
+        if (ab === "rocky-payload" && effType === "rock") add("🪨 Carga Rocosa ×1.5");
+        if (ab === "steely-spirit" && effType === "steel") add("🛡️ Espíritu Acero ×1.5");
+        if (ab === "steelworker" && effType === "steel") add("⚙️ Acerería ×1.5");
+        if (ab === "adaptability" && (stabMult >= 2 || stabMult === 2.25)) {
+          add("⭐ Adaptabilidad STAB");
+        }
+
+        // Status / HP conditional abilities
+        if (ab === "guts" && isPhys && atkr.status !== "none") add("🔥 Agallas ×1.5");
+        if (ab === "toxic-boost" && isPhys && atkr.status === "poison") add("☠️ Impulso Tóxico ×1.5");
+        if (ab === "flare-boost" && !isPhys && atkr.status === "burn") add("🔥 Impulso Ígneo ×1.5");
+        if (ab === "hustle" && isPhys) add("🎲 Entusiasmo ×1.5");
+        if (ab === "gorilla-tactics" && isPhys) add("🦍 Tácticas Macaco ×1.5");
+        if (ab === "intrepid-sword" && isPhys) add("⚔️ Espada Invicta +1 Atq");
+        if (ab === "huge-power" && isPhys) add("💪 Potencia ×2");
+        if (ab === "pure-power" && isPhys) add("💪 Poder Puro ×2");
+        if (ab === "torrent" && effType === "water" && pinchActive) add("💧 Torrente ×1.5");
+        if (ab === "blaze" && effType === "fire" && pinchActive) add("🔥 Mar Llamas ×1.5");
+        if (ab === "overgrow" && effType === "grass" && pinchActive) add("🌿 Espesura ×1.5");
+        if (ab === "swarm" && effType === "bug" && pinchActive) add("🐝 Enjambre ×1.5");
+
+        // Stat-boosting abilities that affect the move being used
+        if (ab === "orichalcum-pulse" && weather === "sun" && isPhys) add("☀️ Pulso Oricalco +Atq");
+        if (ab === "hadron-engine" && terrain === "electric" && !isPhys) add("⚡ Motor Hadrón +AE");
+        if (ab === "protosynthesis" && isParadoxActive(atkr, ab, weather, terrain)) {
+          const boostedStat = getParadoxBoostStat(atkr.finalStats || {});
+          if (boostedStat === "attack" && isPhys) add("☀️ Fotosíntesis Protos +Atq");
+          if (boostedStat === "special-attack" && !isPhys) add("☀️ Fotosíntesis Protos +AE");
+        }
+        if (ab === "quark-drive" && isParadoxActive(atkr, ab, weather, terrain)) {
+          const boostedStat = getParadoxBoostStat(atkr.finalStats || {});
+          if (boostedStat === "attack" && isPhys) add("⚡ Carga Cuántica +Atq");
+          if (boostedStat === "special-attack" && !isPhys) add("⚡ Carga Cuántica +AE");
+        }
+
+        // Field-based offensive ruin abilities
+        if (ab === "sword-of-ruin") add("🗡️ Defensa rival ×0.75");
+        if (ab === "beads-of-ruin" && !isPhys) add("🧪 Defensa Esp. rival ×0.75");
+
+        // Additional attacker ability badges
+        if (ab === "water-bubble" && effType === "water") add("🫧 Burbuja Acuática ×2 Agua");
+        if (ab === "neuroforce" && typeEff > 1) add("🧠 Neurofuerza ×1.25 SE");
+        if (ab === "sniper" && gs.isCrit) add("🎯 Francotirador ×2.25 Crítico");
+
+        // Defender stat-boosting / resistive ability badges
+        if (effectiveDab === "dauntless-shield" && isPhys) add("🛡️ Escudo Invicto +1 Def rival");
+        if (effectiveDab === "dry-skin" && effType === "fire") add("🔥 Piel Seca +×1.25 Fuego");
+        if (effectiveDab === "water-bubble" && effType === "fire") add("🫧 Burbuja Acuática ×0.5 Fuego");
+        if (effectiveDab === "multiscale" && (defr.currentHPPct ?? 100) >= 100) add("🔵 Multiescama ×0.5 (PS llenos)");
+        if (effectiveDab === "shadow-shield" && (defr.currentHPPct ?? 100) >= 100) add("👻 Escudo Sombra ×0.5 (PS llenos)");
+        if (effectiveDab === "thick-fat" && (effType === "fire" || effType === "ice")) add("🍖 Sebo ×0.5");
+        if (effectiveDab === "ice-scales" && !isPhys) add("❄️ Escamas Hielo ×0.5 Esp.");
+        if (effectiveDab === "fluffy" && CONTACT_MOVES.has(mv.slug)) add("🐑 Pelusa ×0.5 Contacto");
+        if (effectiveDab === "fluffy" && effType === "fire") add("🐑🔥 Pelusa ×2 Fuego");
+        if (["filter","solid-rock","prism-armor"].includes(effectiveDab) && typeEff > 1) add("🪨 Filtro ×0.75 SE");
+
+        return badges.join("");
+      }
+
+
       function calcDmg(atkrSide, defrSide, mv) {
         const atkr = gs[atkrSide],
           defr = gs[defrSide];
@@ -5513,6 +6358,9 @@
         // ── Active ability considering Mega ──
         const ab = atkr._activeAbility || atkr.ability;
         const dAb = defr._activeAbility || defr.ability;
+        // Mold Breaker / Teravolt / Turboblaze: ignore defender's ability effects
+        const hasMoldBreaker = ["mold-breaker", "teravolt", "turboblaze"].includes(ab);
+        const effectiveDab = hasMoldBreaker ? "none" : dAb;
 
         // ── Type (Tera changes attacker types) ──
         let effType = mv.type;
@@ -5521,6 +6369,7 @@
           pixilate: "fairy",
           aerilate: "flying",
           galvanize: "electric",
+          dragonize: "dragon",
         };
         let normConv = false;
         if (TRNMAP[ab] && effType === "normal") {
@@ -5528,6 +6377,8 @@
           normConv = true;
         }
         if (ab === "normalize") effType = "normal";
+        // Liquid Voice: Sound moves become Water type
+        if (ab === "liquid-voice" && SOUND_MOVES.has(mv.slug)) effType = "water";
 
         // Tera: attacker's effective STAB types change to teraType
         const atkTypes = atkr.tera ? [atkr.teraType] : atkr.poke.types;
@@ -5535,7 +6386,14 @@
         // Defender types (Tera changes defender types)
         const defTypes = defr.tera ? [defr.teraType] : defr.poke.types;
 
-        const typeEff = getTE(effType, defTypes, dAb);
+        const typeEff = (() => {
+          let te = getTE(effType, defTypes, effectiveDab);
+          // Scrappy: Normal and Fighting are no longer blocked by Ghost
+          if (te === 0 && ab === "scrappy" && ["normal","fighting"].includes(effType)) {
+            te = getTE(effType, defTypes.filter(t => t !== "ghost"), effectiveDab);
+          }
+          return te;
+        })();
         // Z-Moves deal 1 HP to immune types instead of being fully blocked
         if (typeEff === 0) {
           if (atkr.zMove) {
@@ -5712,7 +6570,7 @@
         const w = gs.weather;
         const supW =
           ["cloud-nine", "air-lock"].includes(ab) ||
-          ["cloud-nine", "air-lock"].includes(dAb);
+          ["cloud-nine", "air-lock"].includes(effectiveDab);
 
         // Weather
         if (!supW) {
@@ -5771,7 +6629,7 @@
 
         // Terrain
         const atkrGrnd = !atkTypes.includes("flying") && ab !== "levitate";
-        const defrGrnd = !defTypes.includes("flying") && dAb !== "levitate";
+        const defrGrnd = !defTypes.includes("flying") && effectiveDab !== "levitate";
         if (gs.terrain === "electric" && effType === "electric" && atkrGrnd)
           mod *= 1.3;
         if (gs.terrain === "grassy" && effType === "grass" && atkrGrnd)
@@ -5794,7 +6652,7 @@
         if (isPhys && atkr.status === "burn" && ab !== "guts") mod *= 0.5;
 
         // Critical hit
-        if (gs.isCrit) mod *= 1.5;
+        if (gs.isCrit) mod *= ab === "sniper" ? 2.25 : 1.5;
 
         // Helping Hand
         if (gs.helpingHand) mod *= 1.5;
@@ -5844,30 +6702,42 @@
 
         // Defender ability
         if (
-          ["filter", "solid-rock", "prism-armor"].includes(dAb) &&
+          ["filter", "solid-rock", "prism-armor"].includes(effectiveDab) &&
           typeEff > 1
         )
           mod *= 0.75;
-        if (dAb === "thick-fat" && (effType === "fire" || effType === "ice"))
+        if (effectiveDab === "thick-fat" && (effType === "fire" || effType === "ice"))
           mod *= 0.5;
-        if (dAb === "fluffy" && CONTACT_MOVES.has(mv.slug)) mod *= 0.5;
-        if (dAb === "fluffy" && effType === "fire") mod *= 2;
+        if (effectiveDab === "fluffy" && CONTACT_MOVES.has(mv.slug)) mod *= 0.5;
+        if (effectiveDab === "fluffy" && effType === "fire") mod *= 2;
         if (
-          (dAb === "multiscale" || dAb === "shadow-shield") &&
+          (effectiveDab === "multiscale" || effectiveDab === "shadow-shield") &&
           (defr.currentHPPct ?? 100) >= 100
         )
           mod *= 0.5;
-        if (dAb === "ice-scales" && !isPhys) mod *= 0.5;
-        if (dAb === "punk-rock" && SOUND_MOVES.has(mv.slug)) mod *= 0.5;
-        if (dAb === "heatproof" && effType === "fire") mod *= 0.5;
-        if (dAb === "tablets-of-ruin" && isPhys) mod *= 0.75;
-        if (dAb === "vessel-of-ruin" && !isPhys) mod *= 0.75;
+        if (effectiveDab === "ice-scales" && !isPhys) mod *= 0.5;
+        if (effectiveDab === "punk-rock" && SOUND_MOVES.has(mv.slug)) mod *= 0.5;
+        if (effectiveDab === "heatproof" && effType === "fire") mod *= 0.5;
+        if (effectiveDab === "dry-skin" && effType === "fire") mod *= 1.25;
+        if (effectiveDab === "water-bubble" && effType === "fire") mod *= 0.5;
+        if (effectiveDab === "tablets-of-ruin" && isPhys) mod *= 0.75;
+        if (effectiveDab === "vessel-of-ruin" && !isPhys) mod *= 0.75;
 
         // Defender item (resist berries) — Z-Moves ignore berries
         if (!atkr.zMove) {
           const dIt = getItem(defr.item);
           if (dIt.rb === effType && typeEff > 1) mod *= 0.5;
         }
+
+        // Additional ability boosts not covered above
+        const auraBroken = ab === "aura-break" || effectiveDab === "aura-break";
+        if (!auraBroken && effType === "fairy" && (ab === "fairy-aura" || effectiveDab === "fairy-aura")) mod *= 4 / 3;
+        if (!auraBroken && effType === "dark" && (ab === "dark-aura" || effectiveDab === "dark-aura")) mod *= 4 / 3;
+        if (ab === "toxic-boost" && isPhys && atkr.status === "poison") mod *= 1.5;
+        if (ab === "flare-boost" && !isPhys && atkr.status === "burn") mod *= 1.5;
+        if (ab === "steelworker" && effType === "steel") mod *= 1.5;
+        if (ab === "water-bubble" && effType === "water") mod *= 2;
+        if (ab === "neuroforce" && typeEff > 1) mod *= 1.25;
 
         // Generate rolls
         const defHP = defr.finalStats.hp;
@@ -5975,6 +6845,23 @@
           }
         }
 
+        const abilityBadges = buildAbilityDamageBadges({
+          atkr,
+          defr,
+          mv,
+          effType,
+          isPhys,
+          bp,
+          typeEff,
+          ab,
+          dAb,
+          weather: w,
+          terrain: gs.terrain,
+          normConv,
+          stabMult,
+          supW,
+        });
+
         // Compute tera boost info for display badge
         let teraBoostInfo = null;
         if (atkr.tera) {
@@ -6042,7 +6929,27 @@
           isWeatherBall: !!sp.weatherball,
           itemBoostInfo,
           teraBoostInfo,
+          abilityBadges,
         };
+      }
+
+      // ══════════════════════════════════════════════════════════════════
+      //  PERSISTENT CACHE HELPERS (localStorage con TTL)
+      // ══════════════════════════════════════════════════════════════════
+      const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 días
+
+      function lsGet(key) {
+        try {
+          const raw = localStorage.getItem(key);
+          if (!raw) return null;
+          const { v, t } = JSON.parse(raw);
+          if (Date.now() - t > CACHE_TTL_MS) { localStorage.removeItem(key); return null; }
+          return v;
+        } catch(_) { return null; }
+      }
+
+      function lsSet(key, value) {
+        try { localStorage.setItem(key, JSON.stringify({ v: value, t: Date.now() })); } catch(_) {}
       }
 
       // ══════════════════════════════════════════════════════════════════
@@ -6051,7 +6958,8 @@
       async function loadList() {
         const KEY = "pkDmgList_v2";
         try {
-          const c = sessionStorage.getItem(KEY);
+          // Try sessionStorage first (fastest), then localStorage
+          const c = sessionStorage.getItem(KEY) || localStorage.getItem(KEY);
           if (c) {
             gs.pList = JSON.parse(c);
             onListReady();
@@ -6066,7 +6974,9 @@
             return { name: p.name, id: +pts[pts.length - 1] };
           });
           try {
-            sessionStorage.setItem(KEY, JSON.stringify(gs.pList));
+            const serialized = JSON.stringify(gs.pList);
+            sessionStorage.setItem(KEY, serialized);
+            localStorage.setItem(KEY, serialized); // persist across sessions
           } catch (_) {}
           onListReady();
         } catch (e) {
@@ -6082,14 +6992,73 @@
       async function loadPokemon(s, name) {
         const sd = gs[s];
         try {
+          // ── Try localStorage cache first ──────────────────────────────
+          const lsPoke = lsGet(`poke:${name}`);
+          if (lsPoke) {
+            sd.poke = lsPoke.poke;
+            sd.pokeMoves = lsPoke.pokeMoves;
+            sd._autoSeq = (gs._autoSeq || 0) + 1;
+            gs._autoSeq = sd._autoSeq;
+            sd._autoOrder = sd._autoSeq;
+            if (sd.poke.abilities.length > 0 && sd.ability === "none") sd.ability = sd.poke.abilities[0];
+            const wSel = document.getElementById("weatherSel");
+            const tSel = document.getElementById("terrainSel");
+            if (!gs.weatherAutoSource && gs.weather !== "none") { gs.weather = "none"; if (wSel) wSel.value = "none"; }
+            if (!gs.terrainAutoSource && gs.terrain !== "none") { gs.terrain = "none"; if (tSel) tSel.value = "none"; }
+            updatePanelSprite(s);
+            updatePanelInfo(s);
+            updateAbilitySelect(s);
+            buildStatsTable(s);
+            calcFinalStats(s);
+            updateStatDisplay(s);
+            initMoveSearch(s);
+            checkAutoConditions();
+            updateAll();
+            // Background prefetch only moves not yet in memory cache
+            _prefetchMoves(sd.pokeMoves);
+            return;
+          }
+          // ── Fallback para Mega Evoluciones de Z-A no disponibles en PokeAPI ──
           const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
-          if (!r.ok) return;
+          if (!r.ok) {
+            const zaStatic = ZA_MEGA_POKEMON[name];
+            if (zaStatic) {
+              sd.poke = {
+                id: zaStatic.id,
+                name: name,
+                types: zaStatic.types,
+                base: zaStatic.base,
+                abilities: zaStatic.abilities,
+                weight: zaStatic.weight,
+              };
+              const _zaExtra = FORM_EXTRA_MOVES[name] || [];
+              sd.pokeMoves = [..._zaExtra].sort();
+              sd._autoSeq = (gs._autoSeq || 0) + 1;
+              gs._autoSeq = sd._autoSeq;
+              sd._autoOrder = sd._autoSeq;
+              if (sd.poke.abilities.length > 0 && sd.ability === "none") {
+                sd.ability = sd.poke.abilities[0];
+              }
+              const wSel = document.getElementById("weatherSel");
+              const tSel = document.getElementById("terrainSel");
+              if (!gs.weatherAutoSource && gs.weather !== "none") { gs.weather = "none"; if (wSel) wSel.value = "none"; }
+              if (!gs.terrainAutoSource && gs.terrain !== "none") { gs.terrain = "none"; if (tSel) tSel.value = "none"; }
+              updatePanelSprite(s);
+              updatePanelInfo(s);
+              updateAbilitySelect(s);
+              buildStatsTable(s);
+              calcFinalStats(s);
+              updateStatDisplay(s);
+              initMoveSearch(s);
+              checkAutoConditions();
+              updateAll();
+              _prefetchMoves(sd.pokeMoves);
+            }
+            return;
+          }
           const d = await r.json();
           const base = {};
-          d.stats.forEach((st) => {
-            base[st.stat.name] = st.base_stat;
-          });
-          // d.weight is in hectograms (×10 = kg); store as kg
+          d.stats.forEach((st) => { base[st.stat.name] = st.base_stat; });
           const weightKg = d.weight != null ? d.weight / 10 : null;
           sd.poke = {
             id: d.id,
@@ -6100,47 +7069,24 @@
             weight: weightKg,
           };
           sd.pokeMoves = d.moves.map((m) => m.move.name).sort();
-          // Inject extra moves for forms with incomplete PokeAPI data
           const _formExtra = FORM_EXTRA_MOVES[name] || [];
           if (_formExtra.length) {
             const _s = new Set(sd.pokeMoves);
-            _formExtra.forEach((m) => {
-              if (!_s.has(m)) sd.pokeMoves.push(m);
-            });
+            _formExtra.forEach((m) => { if (!_s.has(m)) sd.pokeMoves.push(m); });
             sd.pokeMoves.sort();
           }
-          // Prefetch current move names so the dropdown can show English (Español)
-          // for the Pokémon's own movepool.
-          Promise.resolve().then(async () => {
-            const slugs = [...sd.pokeMoves];
-            const batchSize = 8;
-            for (let i = 0; i < slugs.length; i += batchSize) {
-              await Promise.allSettled(
-                slugs.slice(i, i + batchSize).map((slug) => loadMove(slug)),
-              );
-            }
-          });
+          // Persist to localStorage so next selection is instant
+          lsSet(`poke:${name}`, { poke: sd.poke, pokeMoves: sd.pokeMoves });
           sd._autoSeq = (gs._autoSeq || 0) + 1;
           gs._autoSeq = sd._autoSeq;
           sd._autoOrder = sd._autoSeq;
           if (sd.poke.abilities.length > 0 && sd.ability === "none") {
             sd.ability = sd.poke.abilities[0];
           }
-          // Clear manually-set weather/terrain (not auto-locked) when a new Pokémon is selected
           const wSel = document.getElementById("weatherSel");
           const tSel = document.getElementById("terrainSel");
-          if (!gs.weatherAutoSource && gs.weather !== "none") {
-            gs.weather = "none";
-            if (wSel) {
-              wSel.value = "none";
-            }
-          }
-          if (!gs.terrainAutoSource && gs.terrain !== "none") {
-            gs.terrain = "none";
-            if (tSel) {
-              tSel.value = "none";
-            }
-          }
+          if (!gs.weatherAutoSource && gs.weather !== "none") { gs.weather = "none"; if (wSel) wSel.value = "none"; }
+          if (!gs.terrainAutoSource && gs.terrain !== "none") { gs.terrain = "none"; if (tSel) tSel.value = "none"; }
           updatePanelSprite(s);
           updatePanelInfo(s);
           updateAbilitySelect(s);
@@ -6150,9 +7096,31 @@
           initMoveSearch(s);
           checkAutoConditions();
           updateAll();
+          // Background prefetch — parallel, prioritise first 40 moves then rest
+          _prefetchMoves(sd.pokeMoves);
         } catch (e) {
           console.error("Pokemon load failed", e);
         }
+      }
+
+      // Parallel prefetch: first 40 immediately, remainder after a short yield
+      function _prefetchMoves(slugs) {
+        const uncached = slugs.filter(s => !gs.moveCache.has(s));
+        if (!uncached.length) return;
+        const first = uncached.slice(0, 40);
+        const rest  = uncached.slice(40);
+        Promise.allSettled(first.map(s => loadMove(s))).then(() => {
+          if (!rest.length) return;
+          // Stagger rest in larger parallel batches after UI is responsive
+          const batchSize = 20;
+          let i = 0;
+          function nextBatch() {
+            if (i >= rest.length) return;
+            Promise.allSettled(rest.slice(i, i + batchSize).map(s => loadMove(s)))
+              .then(() => { i += batchSize; setTimeout(nextBatch, 50); });
+          }
+          setTimeout(nextBatch, 100);
+        });
       }
 
       // Spanish name overrides for moves that PokeAPI lacks ES translation
@@ -6456,6 +7424,9 @@
       };
       async function loadMove(slug) {
         if (gs.moveCache.has(slug)) return gs.moveCache.get(slug);
+        // Check persistent localStorage cache first
+        const lsCached = lsGet(`mv:${slug}`);
+        if (lsCached) { gs.moveCache.set(slug, lsCached); return lsCached; }
         try {
           const r = await fetch(`https://pokeapi.co/api/v2/move/${slug}`);
           if (!r.ok) return null;
@@ -6498,6 +7469,7 @@
               d.meta?.flinch_chance > 0,
           };
           gs.moveCache.set(slug, mv);
+          lsSet(`mv:${slug}`, mv);
           return mv;
         } catch (e) {
           return null;
@@ -6798,6 +7770,9 @@
 
       async function fetchMoveDescription(slug) {
         if (MOVE_DESC_CACHE.has(slug)) return MOVE_DESC_CACHE.get(slug);
+        // Check persistent cache (move data already has description in loadMove cache)
+        const lsMv = lsGet(`mv:${slug}`);
+        if (lsMv && lsMv._desc !== undefined) { MOVE_DESC_CACHE.set(slug, lsMv._desc); return lsMv._desc; }
         const req = (async () => {
           try {
             // Override manual en español — prioridad máxima
@@ -6805,7 +7780,6 @@
             const r = await fetch(`https://pokeapi.co/api/v2/move/${slug}/`);
             if (!r.ok) return null;
             const d = await r.json();
-            // Try Spanish first, then English
             const esFlavor =
               (d.flavor_text_entries || []).find(
                 (x) => x.language?.name === "es" && x.version_group,
@@ -6820,6 +7794,9 @@
               .replace(/\n|\f/g, " ")
               .replace(/\s+/g, " ")
               .trim();
+            // Persist desc alongside the move object if it exists in ls
+            const lsMvData = lsGet(`mv:${slug}`);
+            if (lsMvData) { lsMvData._desc = desc || null; lsSet(`mv:${slug}`, lsMvData); }
             return desc || null;
           } catch (_) {
             return null;
@@ -7603,7 +8580,7 @@
 
       function buildMoveItem(s, i, m) {
         const cached = gs.moveCache.get(m);
-        const displayLabel = cached ? cached.name : fmtName(m);
+        const displayLabel = cached ? cached.name : fmtName(m); // fmtName instantly formats slug
         let typeChip = "";
         if (cached && cached.type) {
           const tc = TC2[cached.type] || { bg: "#888", tx: "#fff" };
@@ -7625,7 +8602,20 @@
                 : "EST";
           catChip = `<span class="mvdd-cat-chip" style="${catSt}">${catLbl}</span>`;
         }
-        return `<div class="mv-dd-item" style="display:flex;align-items:center;gap:.4rem" onclick="pickMove('${s}',${i},'${m}')">${typeChip}${catChip}<span class="mvdd-name">${displayLabel}</span></div>`;
+        // If not cached yet, trigger a background load and re-render on completion
+        if (!cached) {
+          loadMove(m).then(mv => {
+            if (!mv) return;
+            // Re-render any visible items with this slug in all open dropdowns
+            document.querySelectorAll(`[data-mvslug="${m}"]`).forEach(el => {
+              const tc = TC2[mv.type] || { bg: "#888", tx: "#fff" };
+              const catSt = mv.category === "physical" ? "background:#b03030;color:#fff" : mv.category === "special" ? "background:#2a5eaa;color:#fff" : "background:#2e2e4a;color:#8888bb";
+              const catLbl = mv.category === "physical" ? "FIS" : mv.category === "special" ? "ESP" : "EST";
+              el.innerHTML = `<span class="mvdd-type-chip" style="background:${tc.bg};color:${tc.tx}">${TYPE_ES[mv.type] || mv.type}</span><span class="mvdd-cat-chip" style="${catSt}">${catLbl}</span><span class="mvdd-name">${mv.name}</span>`;
+            });
+          });
+        }
+        return `<div class="mv-dd-item" data-mvslug="${m}" style="display:flex;align-items:center;gap:.4rem" onclick="pickMove('${s}',${i},'${m}')">${typeChip}${catChip}<span class="mvdd-name">${displayLabel}</span></div>`;
       }
 
       function initMoveSearch(s) {
@@ -7959,6 +8949,7 @@
       ${res.isGyroBall ? `<span class="turn-badge turn-speed-scale">⚙️ Bola Giro${res.mechLabel ? ` (${res.mechLabel})` : ""}</span>` : ""}
       ${res.isElectroBall ? `<span class="turn-badge turn-speed-scale">⚡ Bola Electro${res.mechLabel ? ` (${res.mechLabel})` : ""}</span>` : ""}
       ${res.isWeatherBall ? `<span class="turn-badge turn-weather-ball">🌤️ Bola Clima${res.mechLabel ? ` → tipo ${TYPE_ES[mv.type] || mv.type} BP:${res.bp}` : ""}</span>` : ""}
+      ${res.abilityBadges || ""}
       ${res.itemBoostInfo ? `<span class="turn-badge turn-item-boost">${res.itemBoostInfo}</span>` : ""}
       ${res.teraBoostInfo ? `<span class="turn-badge turn-tera-boost">${res.teraBoostInfo}</span>` : ""}
       ${effBadge}
