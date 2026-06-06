@@ -8606,8 +8606,8 @@
         if (!cached) {
           loadMove(m).then(mv => {
             if (!mv) return;
-            // Re-render any visible items with this slug in all open dropdowns
-            document.querySelectorAll(`[data-mvslug="${m}"]`).forEach(el => {
+            // Re-render only visible dropdown items (not minfo slots)
+            document.querySelectorAll(`.mv-dropdown [data-mvslug="${m}"], .mv-dd-item[data-mvslug="${m}"]`).forEach(el => {
               const tc = TC2[mv.type] || { bg: "#888", tx: "#fff" };
               const catSt = mv.category === "physical" ? "background:#b03030;color:#fff" : mv.category === "special" ? "background:#2a5eaa;color:#fff" : "background:#2e2e4a;color:#8888bb";
               const catLbl = mv.category === "physical" ? "FIS" : mv.category === "special" ? "ESP" : "EST";
@@ -8739,10 +8739,17 @@
         el.innerHTML =
           `<span class="mv-type" style="background:${tc.bg};color:${tc.tx}">${TYPE_ES[mv.type] || mv.type}</span>` +
           `<span class="mv-cat" style="color:${catColor}">${CAT_ES[mv.category] || mv.category}</span>` +
-          (mv.power ? `<span class="mv-bp">BP:${mv.power}</span>` : "") +
+          (mv.power ? `<span class="mv-bp">BP:${mv.power}</span>` : `<span class="mv-bp" style="color:var(--tdim)">BP:—</span>`) +
+          (mv.accuracy ? `<span class="mv-bp" style="color:#9db7f5">Prec:${mv.accuracy}%</span>` : `<span class="mv-bp" style="color:#9db7f5">Prec:—</span>`) +
+          (mv.pp ? `<span class="mv-bp" style="color:#a7db8d">PP:${mv.pp}</span>` : "") +
           (mv.priority && mv.priority !== 0
             ? `<span class="mv-prio">${mv.priority > 0 ? "+" : ""}${mv.priority}prio</span>`
             : "") +
+          (mv.hasSecondary ? `<span class="mv-prio" style="color:#f5ac78">✦ efecto</span>` : "") +
+          (mv.isContact ? `<span class="mv-prio" style="color:#fa92b2">contacto</span>` : "") +
+          (mv.isSound ? `<span class="mv-prio" style="color:#c8a2d8">sonido</span>` : "") +
+          (mv.isPunch ? `<span class="mv-prio" style="color:#f5ac78">puño</span>` : "") +
+          (mv.isPulse ? `<span class="mv-prio" style="color:#9db7f5">pulso</span>` : "") +
           `<span class="mv-desc" id="${descId}"></span>`;
         // Async load description
         fetchMoveDescription(mv.slug).then((desc) => {
