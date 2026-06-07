@@ -419,7 +419,7 @@
         background: var(--card2);
         border: 1px solid var(--bhi);
         border-radius: 7px;
-        max-height: 240px;
+        max-height: 280px;
         overflow-y: auto;
         z-index: 300;
         box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
@@ -427,6 +427,17 @@
       }
       .dropdown.open {
         display: block;
+      }
+      .dd-list {
+        overflow-y: auto;
+        flex: 1;
+      }
+      .dd-empty {
+        padding: 0.8rem 0.65rem;
+        color: var(--tdim);
+        font-size: 0.78rem;
+        font-style: italic;
+        text-align: center;
       }
       .dd-item {
         display: flex;
@@ -8293,30 +8304,31 @@
         const img = document.getElementById(`img${s}`);
         const ph = document.getElementById(`ph${s}`);
         const ring = document.getElementById(`ring${s}`);
-        const url = artUrl(sd.poke.id, sd.shiny);
+        const artUrlFull = artUrl(sd.poke.id, sd.shiny);
+        const fallback = smallUrl(sd.poke.id);
+
+        // Show the small sprite immediately so there is no blank wait
         img.style.display = "block";
         ph.style.display = "none";
-        img.classList.remove("show");
-        ring.classList.remove("active");
-        img.onerror = () => {
-          img.onerror = null;
-          img.src = smallUrl(sd.poke.id);
+        img.classList.add("show");
+        ring.classList.add("active");
+        img.src = fallback;
+
+        // Load the high-res artwork in the background and swap when ready
+        const hires = new Image();
+        hires.onload = () => {
+          img.src = artUrlFull;
         };
-        img.onload = () => {
-          img.classList.add("show");
-          ring.classList.add("active");
-        };
-        img.src = url;
+        hires.src = artUrlFull;
       }
 
       function clearPokemon(s) {
-        // Reset this side to a blank state
         const prev = gs[s];
         gs[s] = mkSide();
-        gs[s].level = prev.level; // keep level preference
-        // Re-build the panel UI
+        gs[s].level = prev.level;
         buildPanel(s);
         setLevel(s, gs[s].level);
+        if (gs.pList && gs.pList.length > 0) initSearch(s);
         checkAutoConditions();
         buildDmgZone();
         updateAll();
@@ -9102,90 +9114,78 @@
         }
       }
 
-      function initSearch(s) {
-        const box = document.getElementById(`sBox${s}`);
+      function runSearch(s) {
+        const box  = document.getElementById(`sBox${s}`);
         const drop = document.getElementById(`drop${s}`);
         if (!box || !drop) return;
-        box.addEventListener("input", () => {
-          const raw = box.value.trim().toLowerCase();
-          if (!raw) {
-            drop.classList.remove("open");
-            return;
+
+        const raw      = box.value.trim().toLowerCase();
+        const q        = raw.replace(/\s+/g, "-");
+        const rawWords = raw ? raw.split(/\s+/) : [];
+        const qWordsRev = rawWords.length > 1 ? [...rawWords].reverse().join("-") : "";
+
+        const basePool = gs.pList;
+        const formPool = Object.entries(FORM_SPRITE_IDS).map(([name, id]) => ({ name, id }));
+
+        let results;
+        if (!raw) {
+          results = basePool.filter(p => p.id <= 1025).slice(0, 30);
+        } else {
+          const hits = basePool.filter(p => {
+            if (p.name.includes(q) || String(p.id) === raw) return true;
+            if (qWordsRev && p.name.includes(qWordsRev)) return true;
+            const es = (POKE_ES[p.name] || "").toLowerCase();
+            if (es.includes(raw)) return true;
+            const esNoAccent = es.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            if (esNoAccent.includes(raw)) return true;
+            if (fmtName(p.name).toLowerCase().includes(raw)) return true;
+            if (rawWords.length > 1 && rawWords.every(w =>
+              p.name.includes(w) || (POKE_ES[p.name] || "").toLowerCase().includes(w)
+            )) return true;
+            return false;
+          }).slice(0, 28);
+          const formHits = formPool.filter(p => {
+            const fq = (p.name + " " + (POKE_ES[p.name] || "") + " " + fmtName(p.name)).toLowerCase();
+            if (fq.includes(q) || fq.includes(raw)) return true;
+            if (qWordsRev && fq.includes(qWordsRev)) return true;
+            if (rawWords.length > 1 && rawWords.every(w => fq.includes(w))) return true;
+            return false;
+          });
+          results = [...hits, ...formHits.filter(f => !hits.find(h => h.name === f.name))].slice(0, 32);
+        }
+
+        if (!results.length) {
+          drop.innerHTML = `<div class="dd-empty">Sin resultados</div>`;
+        } else {
+          drop.innerHTML = results.map(p =>
+            `<div class="dd-item" onclick="selectPokemon('${s}','${p.name}')"><img src="${ddPokeSpriteUrl(p.name, p.id)}" loading="lazy" onerror="ddPokeImgError(this,'${p.name}',${p.id})"><span>${fmtName(p.name)}</span><span class="dd-num">${padId(p.id)}</span></div>`
+          ).join("");
+        }
+        drop.classList.add("open");
+      }
+
+      function initSearch(s) {
+        const box  = document.getElementById(`sBox${s}`);
+        const drop = document.getElementById(`drop${s}`);
+        if (!box || !drop) return;
+
+        box.addEventListener("focus", () => {
+          runSearch(s);
+          if (navigator.maxTouchPoints > 0) {
+            setTimeout(() => box.scrollIntoView({ behavior: "smooth", block: "start" }), 120);
           }
-          // Normalize spaces to dashes so "iron valiant" matches "iron-valiant"
-          const q = raw.replace(/\s+/g, "-");
-          // Also match Spanish names and pretty English names
-          // Palabras individuales del query (para búsqueda en orden invertido: "mega feraligatr" → "feraligatr-mega")
-          const rawWords = raw.split(/\s+/);
-          const qWordsRev =
-            rawWords.length > 1 ? [...rawWords].reverse().join("-") : "";
-          const hits = gs.pList
-            .filter((p) => {
-              if (p.name.includes(q) || String(p.id) === raw) return true;
-              // Orden invertido: "mega feraligatr" encuentra "feraligatr-mega"
-              if (qWordsRev && p.name.includes(qWordsRev)) return true;
-              const es = (POKE_ES[p.name] || "").toLowerCase();
-              if (es.includes(raw)) return true;
-              const esNoAccent = es
-                .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, "");
-              if (esNoAccent.includes(raw)) return true;
-              const en = fmtName(p.name).toLowerCase();
-              if (en.includes(raw)) return true;
-              // Cada palabra del query aparece en el nombre (todas deben estar, en cualquier orden)
-              if (
-                rawWords.length > 1 &&
-                rawWords.every(
-                  (w) =>
-                    p.name.includes(w) ||
-                    (POKE_ES[p.name] || "").toLowerCase().includes(w),
-                )
-              )
-                return true;
-              return false;
-            })
-            .slice(0, 28);
-          if (!hits.length) {
-            drop.classList.remove("open");
-            return;
-          }
-          // Also inject mega/primal/crowned forms that match the query
-          const formHits = Object.keys(FORM_SPRITE_IDS)
-            .filter((fn) => {
-              const fq = (
-                fn +
-                " " +
-                (POKE_ES[fn] || "") +
-                " " +
-                (fmtName(fn) || "")
-              ).toLowerCase();
-              if (fq.includes(q) || fq.includes(raw)) return true;
-              if (qWordsRev && fq.includes(qWordsRev)) return true;
-              if (rawWords.length > 1 && rawWords.every((w) => fq.includes(w)))
-                return true;
-              return false;
-            })
-            .map((fn) => ({ name: fn, id: FORM_SPRITE_IDS[fn] }));
-          const allHits = [
-            ...hits,
-            ...formHits.filter((f) => !hits.find((h) => h.name === f.name)),
-          ].slice(0, 32);
-          // Showdown sprites para formas (nombre-indexados), smallUrl para normales
-          drop.innerHTML = allHits
-            .map(
-              (p) =>
-                `<div class="dd-item" onclick="selectPokemon('${s}','${p.name}')"><img src="${ddPokeSpriteUrl(p.name, p.id)}" loading="lazy" onerror="ddPokeImgError(this,'${p.name}',${p.id})"><span>${fmtName(p.name)}</span><span class="dd-num">${padId(p.id)}</span></div>`,
-            )
-            .join("");
-          drop.classList.add("open");
         });
-        document.addEventListener(
-          "click",
-          (e) => {
-            if (!e.target.closest(".s-wrap")) drop.classList.remove("open");
-          },
-          { passive: true },
-        );
+        box.addEventListener("input", () => {
+          runSearch(s);
+          if (navigator.maxTouchPoints > 0) {
+            box.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        });
+
+        document.addEventListener("click", (e) => {
+          if (!e.target.closest(".s-wrap")) drop.classList.remove("open");
+        }, { passive: true });
+
         box.addEventListener("keydown", (e) => {
           if (e.key === "Escape") drop.classList.remove("open");
           if (e.key === "Enter") {
