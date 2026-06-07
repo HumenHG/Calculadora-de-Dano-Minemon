@@ -176,6 +176,13 @@
         align-items: center;
         gap: 0.75rem;
       }
+      @media (min-width: 1400px) {
+        .cond-bar {
+          justify-content: center;
+          padding-left: max(1rem, calc(50% - 600px));
+          padding-right: max(1rem, calc(50% - 600px));
+        }
+      }
       .cond-grp {
         display: flex;
         align-items: center;
@@ -1148,16 +1155,20 @@
         letter-spacing: 0.3px;
       }
       .mv-cat {
-        font-size: 0.62rem;
-        color: var(--tdim);
+        font-size: 0.78rem;
+        font-weight: 600;
       }
       .mv-bp {
         font-family: "Orbitron", monospace;
-        font-size: 0.62rem;
-        color: var(--tdim);
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #ffe066;
+        letter-spacing: 0.5px;
+        text-shadow: 0 0 8px rgba(255, 220, 60, 0.5);
       }
       .mv-prio {
-        font-size: 0.6rem;
+        font-size: 0.75rem;
+        font-weight: 600;
         color: #aaa;
       }
       .mv-desc {
@@ -2077,6 +2088,58 @@
         color: var(--thi);
       }
 
+      /* ── Mega split button ── */
+      /* Left half: always fully rounded, flattens when pill is visible */
+      .mega-split-left {
+        border-radius: 20px !important;
+        transition: border-radius 0.2s ease, border-right-color 0.2s ease !important;
+      }
+      .mega-split-left.joined {
+        border-radius: 20px 0 0 20px !important;
+        border-right-color: rgba(96,208,255,0.25) !important;
+      }
+      /* Right pill: hidden by default, expands flush against Mega btn */
+      .mega-form-sel {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        gap: 0.25rem;
+        overflow: hidden;
+        max-width: 0;
+        padding: 0.28rem 0;
+        opacity: 0;
+        pointer-events: none;
+        /* Negative margin cancels the parent flex gap exactly */
+        margin-left: -0.35rem;
+        border-radius: 0 20px 20px 0;
+        border: 1.5px solid #60d0ff;
+        border-left: 1px solid rgba(96,208,255,0.25);
+        background: rgba(96,208,255,0.12);
+        color: #60d0ff;
+        font-family: "Exo 2", sans-serif;
+        font-size: 0.72rem;
+        font-weight: 600;
+        cursor: pointer;
+        white-space: nowrap;
+        box-sizing: border-box;
+        transition: max-width 0.25s ease, opacity 0.2s ease, padding 0.2s ease;
+      }
+      .mega-form-sel.show {
+        max-width: 90px;
+        padding: 0.28rem 0.55rem;
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .mega-form-sel:hover {
+        background: rgba(96,208,255,0.22);
+      }
+      .mega-form-sel .mega-form-dd-sprite {
+        width: 20px;
+        height: 20px;
+        image-rendering: pixelated;
+        flex-shrink: 0;
+      }
+
       /* Mechanic indicator badges on panels */
       .pnl-mech-row {
         display: flex;
@@ -2584,14 +2647,14 @@
         >
           ⚡ Z-Move A
         </button>
-        <button
-          class="mech-btn"
-          id="megaABtn"
-          onclick="toggleMech('A', 'mega')"
-          title="Mega Evolución (Gen 6)"
-        >
-          🔮 Mega A
-        </button>
+        <button class="mech-btn mega-split-left" id="megaABtn" onclick="toggleMech('A', 'mega')" title="Mega Evolución (Gen 6)">
+            🔮 Mega A
+          </button>
+          <button class="mega-split-form mega-form-sel" id="megaFormASel" onclick="cycleMegaForm('A')" title="Cambiar forma Mega">
+            <img class="mega-form-dd-sprite" id="megaFormASprite" src="" alt="" style="display:none">
+            <span id="megaFormALabel">X</span>
+            <span style="font-size:0.55rem;opacity:0.7;">▾</span>
+          </button>
         <button
           class="mech-btn"
           id="dmaxABtn"
@@ -2625,14 +2688,14 @@
         >
           ⚡ Z-Move B
         </button>
-        <button
-          class="mech-btn"
-          id="megaBBtn"
-          onclick="toggleMech('B', 'mega')"
-          title="Mega Evolución (Gen 6)"
-        >
-          🔮 Mega B
-        </button>
+        <button class="mech-btn mega-split-left" id="megaBBtn" onclick="toggleMech('B', 'mega')" title="Mega Evolución (Gen 6)">
+            🔮 Mega B
+          </button>
+          <button class="mega-split-form mega-form-sel" id="megaFormBSel" onclick="cycleMegaForm('B')" title="Cambiar forma Mega">
+            <img class="mega-form-dd-sprite" id="megaFormBSprite" src="" alt="" style="display:none">
+            <span id="megaFormBLabel">X</span>
+            <span style="font-size:0.55rem;opacity:0.7;">▾</span>
+          </button>
         <button
           class="mech-btn"
           id="dmaxBBtn"
@@ -2643,12 +2706,36 @@
         </button>
       </div>
     </div>
-
     <div class="arena" id="arena">
       <div id="panelA" class="poke-panel side-a"></div>
       <div class="vs-badge">VS</div>
+      <div id="mechB-anchor"></div>
       <div id="panelB" class="poke-panel side-b"></div>
     </div>
+    <style>
+      #mechB-anchor { display: contents; }
+      #mechB-anchor .mech-group {
+        background: var(--card2);
+        border: 1px solid var(--bhi);
+        border-radius: 8px;
+        padding: 0.4rem 0.6rem;
+        margin: 0.2rem 0;
+        flex-wrap: wrap;
+        gap: 0.28rem;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        box-sizing: border-box;
+      }
+    </style>
+    <script>
+      if (navigator.maxTouchPoints > 0) {
+        const groups = document.querySelectorAll("#mechBar .mech-group");
+        const groupB = groups[1];
+        const anchor = document.getElementById("mechB-anchor");
+        if (groupB && anchor) anchor.appendChild(groupB);
+      }
+    </script>
 
     <div class="dmg-zone" id="dmgZone"></div>
 
@@ -3299,6 +3386,182 @@
         return last;
       }
 
+      // ── MAX MOVE NAMES BY TYPE ──────────────────────────────────────────
+      // Status moves → Max Guard; damaging moves → Max <X> by type
+      const MAX_MOVE_BY_TYPE = {
+        normal:   "Max Strike",
+        fire:     "Max Flare",
+        water:    "Max Geyser",
+        electric: "Max Lightning",
+        grass:    "Max Overgrowth",
+        ice:      "Max Hailstorm",
+        fighting: "Max Knuckle",
+        poison:   "Max Ooze",
+        ground:   "Max Quake",
+        flying:   "Max Airstream",
+        psychic:  "Max Mindstorm",
+        bug:      "Max Flutterby",
+        rock:     "Max Rockfall",
+        ghost:    "Max Phantasm",
+        dragon:   "Max Wyrmwind",
+        dark:     "Max Darkness",
+        steel:    "Max Steelspike",
+        fairy:    "Max Starfall",
+      };
+      const MAX_MOVE_ES_BY_TYPE = {
+        normal:   "Maxiimpacto",
+        fire:     "Maxillama",
+        water:    "Maxigéiser",
+        electric: "Maxirayo",
+        grass:    "Maxicrecimiento",
+        ice:      "Maxigranizo",
+        fighting: "Maxipuñetazo",
+        poison:   "Maxitóxico",
+        ground:   "Maxiterremoto",
+        flying:   "Maxicorriente",
+        psychic:  "Maximensaje",
+        bug:      "Maxipolvillo",
+        rock:     "Maxiroca",
+        ghost:    "Maxifantasma",
+        dragon:   "Maxiviento",
+        dark:     "Maxisiniestro",
+        steel:    "Maxiacero",
+        fairy:    "Maxiestrella",
+      };
+
+      // ── G-MAX MOVE NAMES ────────────────────────────────────────────────
+      // Maps: pokemonName → { type: "fire", en: "G-Max Wildfire", es: "Gigallamarada" }
+      // Only for the move type that gets replaced; other types use normal Max Moves
+      const GMAX_MOVES = {
+        "venusaur":    { type: "poison",   en: "G-Max Vine Lash",     es: "Gigacilantro" },
+        "charizard":   { type: "fire",     en: "G-Max Wildfire",      es: "Gigallamarada" },
+        "blastoise":   { type: "water",    en: "G-Max Cannonade",     es: "Gigacañonazo" },
+        "butterfree":  { type: "bug",      en: "G-Max Befuddle",      es: "Gigapolvareda" },
+        "pikachu":     { type: "electric", en: "G-Max Volt Crash",    es: "Gigavoltaje" },
+        "meowth":      { type: "normal",   en: "G-Max Gold Rush",     es: "Gigamonedero" },
+        "machamp":     { type: "fighting", en: "G-Max Chi Strike",    es: "Gigagancho" },
+        "gengar":      { type: "ghost",    en: "G-Max Terror",        es: "Gigaterror" },
+        "kingler":     { type: "water",    en: "G-Max Foam Burst",    es: "Gigaburbuja" },
+        "lapras":      { type: "water",    en: "G-Max Resonance",     es: "Gigarresonancia" },
+        "eevee":       { type: "normal",   en: "G-Max Cuddle",        es: "Gigacaricia" },
+        "snorlax":     { type: "normal",   en: "G-Max Replenish",     es: "Gigareponer" },
+        "garbodor":    { type: "poison",   en: "G-Max Malodor",       es: "Gigahedor" },
+        "melmetal":    { type: "steel",    en: "G-Max Meltdown",      es: "Gigafusión" },
+        "rillaboom":   { type: "grass",    en: "G-Max Drum Solo",     es: "Gigagroove" },
+        "cinderace":   { type: "fire",     en: "G-Max Fireball",      es: "Gigapelotas" },
+        "inteleon":    { type: "water",    en: "G-Max Hydrosnipe",    es: "Gigafranco" },
+        "corviknight": { type: "flying",   en: "G-Max Wind Rage",     es: "Gigaviento" },
+        "orbeetle":    { type: "psychic",  en: "G-Max Gravitas",      es: "Gigagravedad" },
+        "drednaw":     { type: "water",    en: "G-Max Stonesurge",    es: "Gigamarejada" },
+        "coalossal":   { type: "fire",     en: "G-Max Volcalith",     es: "Gigacarbón" },
+        "flapple":     { type: "grass",    en: "G-Max Tartness",      es: "Gigaácido" },
+        "appletun":    { type: "grass",    en: "G-Max Sweetness",     es: "Gigadulzura" },
+        "sandaconda":  { type: "ground",   en: "G-Max Sandblast",     es: "Gigaarena" },
+        "toxtricity":  { type: "electric", en: "G-Max Stun Shock",    es: "Gigaparálisis" },
+        "centiskorch": { type: "fire",     en: "G-Max Centiferno",    es: "Gigacentella" },
+        "hatterene":   { type: "fairy",    en: "G-Max Smite",         es: "Gigabufido" },
+        "grimmsnarl":  { type: "dark",     en: "G-Max Snooze",        es: "Gigasomnífero" },
+        "alcremie":    { type: "fairy",    en: "G-Max Finale",        es: "Gigacrema" },
+        "copperajah":  { type: "steel",    en: "G-Max Steelsurge",    es: "Gigacobre" },
+        "duraludon":   { type: "steel",    en: "G-Max Depletion",     es: "Gigaagotamiento" },
+        "urshifu":     { type: "fighting", en: "G-Max One Blow",      es: "Gigagolpe" },
+      };
+
+      // Returns { en, es } name for a Max/G-Max move given the base move and attacker
+      // ── Z-MOVE NAMES BY TYPE ────────────────────────────────────────────
+      const Z_MOVE_BY_TYPE = {
+        normal:   "Breakneck Blitz",
+        fire:     "Inferno Overdrive",
+        water:    "Hydro Vortex",
+        electric: "Gigavolt Havoc",
+        grass:    "Bloom Doom",
+        ice:      "Subzero Slammer",
+        fighting: "All-Out Pummeling",
+        poison:   "Acid Downpour",
+        ground:   "Tectonic Rage",
+        flying:   "Supersonic Skystrike",
+        psychic:  "Shattered Psyche",
+        bug:      "Savage Spin-Out",
+        rock:     "Continental Crush",
+        ghost:    "Never-Ending Nightmare",
+        dragon:   "Devastating Drake",
+        dark:     "Black Hole Eclipse",
+        steel:    "Corkscrew Crash",
+        fairy:    "Twinkle Tackle",
+      };
+      const Z_MOVE_ES_BY_TYPE = {
+        normal:   "Catastrofismo Bestial",
+        fire:     "Incendio Supremo",
+        water:    "Hidrotorbellino",
+        electric: "Cataclismo Voltaico",
+        grass:    "Jardín del Caos",
+        ice:      "Azote Glacial",
+        fighting: "Destrucción Pugilística",
+        poison:   "Lluvia Ácida",
+        ground:   "Furia Tectónica",
+        flying:   "Derribo Supersónico",
+        psychic:  "Psique Astillada",
+        bug:      "Espiral Salvaje",
+        rock:     "Aplastamiento Continental",
+        ghost:    "Pesadilla Interminable",
+        dragon:   "Devastación Draconiana",
+        dark:     "Eclipse del Agujero Negro",
+        steel:    "Embestida Tirabuzón",
+        fairy:    "Acometida Mágica",
+      };
+
+      // ── SIGNATURE Z-MOVES ─────────────────────────────────────────────
+      // Format: "pokemonName|move-slug" → { en, es }
+      const SIGNATURE_Z_MOVES = {
+        "eevee|last-resort":          { en: "Extreme Evoboost",              es: "Suprema Revolución" },
+        "pikachu|volt-tackle":        { en: "10,000,000 Volt Thunderbolt",   es: "Rayo de 10.000.000 V" },
+        "raichu|thunderbolt":         { en: "Stoked Sparksurfer",            es: "Surfista Electrizante" },
+        "snorlax|giga-impact":        { en: "Pulverizing Pancake",           es: "Aplastamiento Bestial" },
+        "mew|psychic":                { en: "Genesis Supernova",             es: "Supernova Génesis" },
+        "incineroar|darkest-lariat":  { en: "Malicious Moonsault",           es: "Malicioso Claoquet" },
+        "decidueye|spirit-shackle":   { en: "Sinister Arrow Raid",           es: "Aluvión de Flechas Sombrías" },
+        "primarina|sparkling-aria":   { en: "Oceanic Operetta",              es: "Opereta Oceánica" },
+        "kommo-o|clanging-scales":    { en: "Clangorous Soulblaze",          es: "Estruendo del Alma" },
+        "marshadow|spectral-thief":   { en: "Soul-Stealing 7-Star Strike",   es: "Embestida Robaalmas" },
+        "necrozma|sunsteel-strike":   { en: "Light That Burns the Sky",      es: "Luz que Abrasa el Cielo" },
+        "necrozma|moongeist-beam":    { en: "Light That Burns the Sky",      es: "Luz que Abrasa el Cielo" },
+        "lycanroc|stone-edge":        { en: "Splintered Stormshards",        es: "Tormenta de Esquirlas" },
+        "mimikyu|play-rough":         { en: "Let's Snuggle Forever",         es: "Abrazo Sin Fin" },
+        "tapu-koko|natures-madness":  { en: "Guardian of Alola",             es: "Guardián de Alola" },
+        "tapu-lele|natures-madness":  { en: "Guardian of Alola",             es: "Guardián de Alola" },
+        "tapu-bulu|natures-madness":  { en: "Guardian of Alola",             es: "Guardián de Alola" },
+        "tapu-fini|natures-madness":  { en: "Guardian of Alola",             es: "Guardián de Alola" },
+        "lunala|moongeist-beam":      { en: "Menacing Moonraze Maelstrom",   es: "Maelstrom Lunar" },
+        "solgaleo|sunsteel-strike":   { en: "Searing Sunraze Smash",         es: "Devastador Solar" },
+        "zeraora|plasma-fists":       { en: "Gigavolt Havoc",                es: "Cataclismo Voltaico" },
+        "alolan-raichu|thunderbolt":  { en: "Stoked Sparksurfer",            es: "Surfista Electrizante" },
+      };
+
+      function getZMoveName(mv, pokeName) {
+        if (!mv || mv.category === "status") return null; // Status Z-Moves boost stats, no damage name needed
+        // Check signature Z-Move first
+        if (pokeName && mv.slug) {
+          const sigKey = `${pokeName}|${mv.slug}`;
+          if (SIGNATURE_Z_MOVES[sigKey]) return SIGNATURE_Z_MOVES[sigKey];
+        }
+        // Generic Z-Move by type
+        const en = Z_MOVE_BY_TYPE[mv.type] || "Z-Move";
+        const es = Z_MOVE_ES_BY_TYPE[mv.type] || en;
+        return { en, es };
+      }
+
+      function getMaxMoveName(mv, pokeName) {
+        if (!mv || mv.category === "status") return { en: "Max Guard", es: "Maxiguardia" };
+        const isGmax = pokeName && !!GMAX_SPRITE_ID[pokeName]; // has gmax form
+        if (isGmax && pokeName) {
+          const gd = GMAX_MOVES[pokeName];
+          if (gd && gd.type === mv.type) return { en: gd.en, es: gd.es };
+        }
+        const en = MAX_MOVE_BY_TYPE[mv.type] || "Max Move";
+        const es = MAX_MOVE_ES_BY_TYPE[mv.type] || en;
+        return { en, es };
+      }
+
       // ── MEGA STAT OVERRIDES ─────────────────────────────────────────
       // Only species that have well-known Mega forms (base stats delta)
       // Format: pokemonName -> { base stat overrides, abilityOverride? }
@@ -3314,7 +3577,7 @@
           },
           ability: "thick-fat",
         },
-        charizard: {
+        "charizard-x": {
           base: {
             hp: 78,
             attack: 130,
@@ -3324,7 +3587,20 @@
             speed: 100,
           },
           ability: "tough-claws",
-        }, // X
+          types: ["fire", "dragon"],
+        },
+        "charizard-y": {
+          base: {
+            hp: 78,
+            attack: 104,
+            defense: 78,
+            "special-attack": 159,
+            "special-defense": 115,
+            speed: 100,
+          },
+          ability: "drought",
+          types: ["fire", "flying"],
+        },
         blastoise: {
           base: {
             hp: 79,
@@ -3401,6 +3677,7 @@
             speed: 105,
           },
           ability: "aerilate",
+          types: ["bug", "flying"],
         },
         gyarados: {
           base: {
@@ -3412,6 +3689,7 @@
             speed: 81,
           },
           ability: "mold-breaker",
+          types: ["water", "dark"],
         },
         aerodactyl: {
           base: {
@@ -3424,7 +3702,7 @@
           },
           ability: "tough-claws",
         },
-        mewtwo: {
+        "mewtwo-x": {
           base: {
             hp: 106,
             attack: 190,
@@ -3434,7 +3712,20 @@
             speed: 130,
           },
           ability: "steadfast",
-        }, // X
+          types: ["psychic", "fighting"],
+        },
+        "mewtwo-y": {
+          base: {
+            hp: 106,
+            attack: 150,
+            defense: 70,
+            "special-attack": 194,
+            "special-defense": 120,
+            speed: 140,
+          },
+          ability: "insomnia",
+          types: ["psychic"],
+        },
         ampharos: {
           base: {
             hp: 90,
@@ -3445,6 +3736,7 @@
             speed: 45,
           },
           ability: "mold-breaker",
+          types: ["electric", "dragon"],
         },
         steelix: {
           base: {
@@ -3544,6 +3836,7 @@
             speed: 50,
           },
           ability: "filter",
+          types: ["steel"],
         },
         medicham: {
           base: {
@@ -3599,6 +3892,7 @@
             speed: 80,
           },
           ability: "pixilate",
+          types: ["dragon", "fairy"],
         },
         banette: {
           base: {
@@ -3687,6 +3981,7 @@
             speed: 50,
           },
           ability: "healer",
+          types: ["normal", "fairy"],
         },
         diancie: {
           base: {
@@ -3709,6 +4004,7 @@
             speed: 135,
           },
           ability: "scrappy",
+          types: ["normal", "fighting"],
         },
         salamence: {
           base: {
@@ -3764,6 +4060,7 @@
             speed: 145,
           },
           ability: "lightning-rod",
+          types: ["grass", "dragon"],
         },
         glalie: {
           base: {
@@ -3981,8 +4278,15 @@
         // Deactivate all
         mechs.forEach((m) => (sd[mechMap[m]] = false));
         // Toggle on if was off
-        if (!wasActive) sd[mechMap[mech]] = true;
+        if (!wasActive) {
+          sd[mechMap[mech]] = true;
+          // Default to "x" form for dual-mega Pokémon when first activating mega
+          if (mech === "mega" && sd.poke && DUAL_MEGA_POKEMON.has(sd.poke.name) && !sd.megaForm) {
+            sd.megaForm = "x";
+          }
+        }
         updateMechUI(s);
+        updatePanelSprite(s);
         updateTypeMatchupDisplay(s);
         calcFinalStats(s);
         updateStatDisplay(s);
@@ -4025,6 +4329,15 @@
         // Show/hide tera type selector
         const teraSel = document.getElementById(`tera${S}Sel`);
         if (teraSel) teraSel.classList.toggle("show", sd.tera);
+        // Show/hide mega form selector (only for Pokémon with 2 mega forms)
+        const megaFormSel = document.getElementById(`megaForm${S}Sel`);
+        if (megaFormSel) {
+          const isDualMega = sd.mega && sd.poke && DUAL_MEGA_POKEMON.has(sd.poke.name);
+          megaFormSel.classList.toggle("show", isDualMega);
+          const leftBtn = document.getElementById(`mega${S}Btn`);
+          if (leftBtn) leftBtn.classList.toggle("joined", isDualMega);
+          if (isDualMega) updateMegaFormDDDisplay(S, sd.megaForm || "x");
+        }
         // Update panel badges
         updatePanelMechBadges(s);
       }
@@ -4049,7 +4362,12 @@
           {
             id: `pmMega${s}`,
             active: sd.mega,
-            text: "🔮 MEGA",
+            text: (() => {
+              if (sd.mega && sd.poke && DUAL_MEGA_POKEMON.has(sd.poke.name)) {
+                return `🔮 MEGA ${(sd.megaForm || "x").toUpperCase()}`;
+              }
+              return "🔮 MEGA";
+            })(),
             cls: "pm-mega",
           },
           {
@@ -4180,6 +4498,7 @@
           teraType: "normal",
           zMove: false,
           mega: false,
+          megaForm: null, // "x" | "y" | null (for dual-mega Pokémon like Charizard/Mewtwo)
           dynamax: false,
         };
       }
@@ -4608,6 +4927,82 @@
         "zacian-crowned": 10286,
         "zamazenta-crowned": 10287,
       };
+      // Pokémon with two different Mega Evolutions (X and Y variants)
+      const DUAL_MEGA_POKEMON = new Set(["charizard", "mewtwo"]);
+
+      // Helper: returns the effective type array for a side,
+      // accounting for Tera, Mega type changes, etc.
+      function effectiveTypes(sd) {
+        if (!sd || !sd.poke) return [];
+        if (sd.tera) return [sd.teraType];
+        if (sd.mega) {
+          const megaKey = DUAL_MEGA_POKEMON.has(sd.poke.name)
+            ? sd.poke.name + "-" + (sd.megaForm || "x")
+            : sd.poke.name;
+          const mk = MEGA_DATA[megaKey];
+          if (mk && mk.types) return mk.types;
+        }
+        return sd.poke.types;
+      }
+
+      function setMegaForm(s, form) {
+        const sd = gs[s];
+        sd.megaForm = form;
+        updatePanelSprite(s);
+        updatePanelInfo(s);
+        calcFinalStats(s);
+        updateStatDisplay(s);
+        updateAll();
+      }
+
+      // Mega form split-button helpers
+      function megaStoneSpriteUrl(pokeName, form) {
+        const MEGA_STONE_ITEMS = {
+          "charizard-x": "charizardite-x",
+          "charizard-y": "charizardite-y",
+          "mewtwo-x": "mewtwonite-x",
+          "mewtwo-y": "mewtwonite-y",
+        };
+        const key = `${pokeName}-${form}`;
+        const item = MEGA_STONE_ITEMS[key];
+        if (!item) return "";
+        return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${item}.png`;
+      }
+
+      function updateMegaFormDDDisplay(s, form) {
+        const sd = gs[s];
+        const pokeName = sd.poke ? sd.poke.name : "";
+        const label = document.getElementById(`megaForm${s}Label`);
+        const sprite = document.getElementById(`megaForm${s}Sprite`);
+        if (label) label.textContent = form.toUpperCase();
+        const url = megaStoneSpriteUrl(pokeName, form);
+        if (sprite) {
+          if (url) { sprite.src = url; sprite.style.display = ""; sprite.onerror = () => { sprite.style.display = "none"; }; }
+          else { sprite.src = ""; sprite.style.display = "none"; }
+        }
+        // toggle joined border on the mega button
+        const leftBtn = document.getElementById(`mega${s}Btn`);
+        const formSel = document.getElementById(`megaForm${s}Sel`);
+        const isShown = formSel && formSel.classList.contains("show");
+        if (leftBtn) leftBtn.classList.toggle("joined", isShown);
+      }
+
+      function cycleMegaForm(s) {
+        const sd = gs[s];
+        const newForm = (sd.megaForm || "x") === "x" ? "y" : "x";
+        setMegaForm(s, newForm);
+        updateMegaFormDDDisplay(s, newForm);
+      }
+
+      // Keep pickMegaForm for any legacy calls
+      function pickMegaForm(s, form) {
+        setMegaForm(s, form);
+        updateMegaFormDDDisplay(s, form);
+      }
+
+      // No-op — split button needs no toggle logic
+      function toggleMegaFormDD(s) {}
+
       function getSpriteId(nameOrId) {
         if (typeof nameOrId === "string" && FORM_SPRITE_IDS[nameOrId])
           return FORM_SPRITE_IDS[nameOrId];
@@ -5310,7 +5705,10 @@
         let baseStats = sd.poke.base;
         let activeAbility = sd.ability;
         if (sd.mega) {
-          const mk = MEGA_DATA[sd.poke.name];
+          const megaKey = DUAL_MEGA_POKEMON.has(sd.poke.name)
+            ? sd.poke.name + "-" + (sd.megaForm || "x")
+            : sd.poke.name;
+          const mk = MEGA_DATA[megaKey];
           if (mk) {
             baseStats = mk.base;
             if (mk.ability) activeAbility = mk.ability;
@@ -6273,7 +6671,7 @@
           add(`🔨 ${ABILITY_ES[ab] || fmtAbil(ab)}: ignora ${ABILITY_ES[dAb] || dAb}`);
         }
         // Scrappy: hits Ghost
-        if (ab === "scrappy" && ["normal","fighting"].includes(effType) && (defr.tera ? [defr.teraType] : defr.poke.types).includes("ghost")) {
+        if (ab === "scrappy" && ["normal","fighting"].includes(effType) && effectiveTypes(defr).includes("ghost")) {
           add(`💥 Combativo: alcanza fantasma`);
         }
 
@@ -6434,10 +6832,10 @@
         if (ab === "liquid-voice" && SOUND_MOVES.has(mv.slug)) effType = "water";
 
         // Tera: attacker's effective STAB types change to teraType
-        const atkTypes = atkr.tera ? [atkr.teraType] : atkr.poke.types;
+        const atkTypes = effectiveTypes(atkr);
 
-        // Defender types (Tera changes defender types)
-        const defTypes = defr.tera ? [defr.teraType] : defr.poke.types;
+        // Defender types (Tera/Mega changes defender types)
+        const defTypes = effectiveTypes(defr);
 
         const typeEff = (() => {
           let te = getTE(effType, defTypes, effectiveDab);
@@ -6650,7 +7048,7 @@
               stabMult = 2.25; // adaptability tera overlap — unofficial cap
             else if (teraMatch || origHasStab) stabMult = 2;
           } else {
-            if (atkr.poke.types.includes(effType)) stabMult = 2;
+            if (atkTypes.includes(effType)) stabMult = 2;
           }
         } else {
           if (atkr.tera) {
@@ -6662,8 +7060,8 @@
             if (
               ab === "protean" ||
               ab === "libero" ||
-              (normConv && atkr.poke.types.includes("normal")) ||
-              atkr.poke.types.includes(effType)
+              (normConv && atkTypes.includes("normal")) ||
+              atkTypes.includes(effType)
             )
               stabMult = 1.5;
           }
@@ -7060,6 +7458,7 @@
             if (!gs.terrainAutoSource && gs.terrain !== "none") { gs.terrain = "none"; if (tSel) tSel.value = "none"; }
             updatePanelSprite(s);
             updatePanelInfo(s);
+            updateMechUI(s);
             updateAbilitySelect(s);
             buildStatsTable(s);
             calcFinalStats(s);
@@ -7098,6 +7497,7 @@
               if (!gs.terrainAutoSource && gs.terrain !== "none") { gs.terrain = "none"; if (tSel) tSel.value = "none"; }
               updatePanelSprite(s);
               updatePanelInfo(s);
+              updateMechUI(s);
               updateAbilitySelect(s);
               buildStatsTable(s);
               calcFinalStats(s);
@@ -7142,6 +7542,7 @@
           if (!gs.terrainAutoSource && gs.terrain !== "none") { gs.terrain = "none"; if (tSel) tSel.value = "none"; }
           updatePanelSprite(s);
           updatePanelInfo(s);
+          updateMechUI(s);
           updateAbilitySelect(s);
           buildStatsTable(s);
           calcFinalStats(s);
@@ -8296,6 +8697,43 @@
       // ══════════════════════════════════════════════════════════════════
       //  UI — Updates
       // ══════════════════════════════════════════════════════════════════
+      // ── Gigamax sprite IDs (from PokeAPI pokemon_forms.csv) ─────────────
+      // Maps base pokemon name → sprite ID for official-artwork
+      const GMAX_SPRITE_ID = {
+        "venusaur":   10195,
+        "charizard":  10196,
+        "blastoise":  10197,
+        "butterfree": 10198,
+        "pikachu":    10199,
+        "meowth":     10200,
+        "machamp":    10201,
+        "gengar":     10202,
+        "kingler":    10203,
+        "lapras":     10204,
+        "eevee":      10205,
+        "snorlax":    10206,
+        "garbodor":   10207,
+        "melmetal":   10208,
+        "rillaboom":  10209,
+        "cinderace":  10210,
+        "inteleon":   10211,
+        "corviknight":10212,
+        "orbeetle":   10213,
+        "drednaw":    10214,
+        "coalossal":  10215,
+        "flapple":    10216,
+        "appletun":   10217,
+        "sandaconda": 10218,
+        "toxtricity": 10219,
+        "centiskorch":10220,
+        "hatterene":  10221,
+        "grimmsnarl": 10222,
+        "alcremie":   10223,
+        "copperajah": 10224,
+        "duraludon":  10225,
+        "urshifu":    10226,
+      };
+
       function updatePanelSprite(s) {
         const sd = gs[s];
         const btn = document.getElementById(`clearPokeBtn${s}`);
@@ -8304,8 +8742,25 @@
         const img = document.getElementById(`img${s}`);
         const ph = document.getElementById(`ph${s}`);
         const ring = document.getElementById(`ring${s}`);
-        const artUrlFull = artUrl(sd.poke.id, sd.shiny);
-        const fallback = smallUrl(sd.poke.id);
+
+        // Determine target sprite ID
+        let targetId = sd.poke.id;
+
+        // Mega sprite — swap to mega form sprite
+        if (sd.mega) {
+          let megaKey = sd.poke.name + "-mega";
+          if (DUAL_MEGA_POKEMON.has(sd.poke.name)) {
+            megaKey = sd.poke.name + "-mega-" + (sd.megaForm || "x");
+          }
+          if (FORM_SPRITE_IDS[megaKey]) targetId = megaKey; // string key → getSpriteId resolves numeric ID
+        }
+
+        // Gigamax sprite overrides mega when Dynamax is active
+        const gmaxId = sd.dynamax && GMAX_SPRITE_ID[sd.poke.name];
+        if (gmaxId) targetId = gmaxId;
+
+        const artUrlFull = artUrl(targetId, sd.shiny);
+        const fallback = smallUrl(targetId);
 
         // Show the small sprite immediately so there is no blank wait
         img.style.display = "block";
@@ -8316,8 +8771,12 @@
 
         // Load the high-res artwork in the background and swap when ready
         const hires = new Image();
-        hires.onload = () => {
-          img.src = artUrlFull;
+        hires.onload = () => { img.src = artUrlFull; };
+        hires.onerror = () => {
+          // Mega/Gigamax artwork not found, fall back to normal
+          if (targetId !== sd.poke.id) {
+            img.src = artUrl(sd.poke.id, sd.shiny);
+          }
         };
         hires.src = artUrlFull;
       }
@@ -8328,6 +8787,8 @@
         gs[s].level = prev.level;
         buildPanel(s);
         setLevel(s, gs[s].level);
+        updateMechUI(s);
+        updatePanelSprite(s);
         if (gs.pList && gs.pList.length > 0) initSearch(s);
         checkAutoConditions();
         buildDmgZone();
@@ -8394,7 +8855,7 @@
           sd.poke.name,
         );
         document.getElementById(`pId${s}`).textContent = padId(sd.poke.id);
-        document.getElementById(`pTypes${s}`).innerHTML = sd.poke.types
+        document.getElementById(`pTypes${s}`).innerHTML = effectiveTypes(sd)
           .map((t) => {
             const c = TC2[t] || { bg: "#888", tx: "#fff" };
             return `<span class="t-chip" style="background:${c.bg};color:${c.tx}">${TYPE_ES[t] || t}</span>`;
@@ -8428,8 +8889,8 @@
         // Remove existing matchup section if any
         const existing = panelEl.querySelector(".type-matchup-section");
         if (existing) existing.remove();
-        // Determine effective types (tera overrides)
-        const types = sd.tera ? [sd.teraType] : sd.poke.types;
+        // Determine effective types (tera/mega overrides)
+        const types = effectiveTypes(sd);
         const ability = sd.ability || "none";
         const html = renderTypeMatchupSection(types, ability);
         if (html) {
@@ -8875,12 +9336,28 @@
         const defSide = atkSide === "A" ? "B" : "A";
         const tc = TC2[mv.type] || { bg: "#888", tx: "#fff" };
         const catColor = CAT_COLOR[mv.category] || "#aaa";
+
+        // ── Dynamax / G-Max move name override ──────────────────────────
+        const isDmax = gs[atkSide].dynamax;
+        const isZMove = gs[atkSide].zMove;
+        const pokeName = gs[atkSide].poke?.name || "";
+        const maxName = isDmax ? getMaxMoveName(mv, pokeName) : null;
+        const zMoveName = isZMove ? getZMoveName(mv, pokeName) : null;
+
+        let displayName;
+        if (maxName) {
+          displayName = `<span style="color:#ff6666;font-weight:700">${maxName.es}</span><span style="color:var(--tdim);font-size:.7rem;margin-left:.3rem">(${mv.name})</span>`;
+        } else if (zMoveName) {
+          displayName = `<span style="color:#ffe040;font-weight:700;text-shadow:0 0 8px rgba(255,224,64,.5)">${zMoveName.es}</span><span style="color:var(--tdim);font-size:.7rem;margin-left:.3rem">(${mv.name})</span>`;
+        } else {
+          displayName = mv.name;
+        }
         if (!res)
-          return `<div class="dmg-move"><div class="dmg-move-top"><span class="mv-type" style="background:${tc.bg};color:${tc.tx}">${TYPE_ES[mv.type] || mv.type}</span><span class="dmg-move-name">${mv.name}</span><span style="color:${catColor};font-size:.65rem">${mv.category === "physical" ? "⚔️ Fís." : mv.category === "special" ? "🔮 Esp." : "💫 Est."}</span></div><div class="dmg-status dmg-immune">Sin datos</div></div>`;
+          return `<div class="dmg-move"><div class="dmg-move-top"><span class="mv-type" style="background:${tc.bg};color:${tc.tx}">${TYPE_ES[mv.type] || mv.type}</span><span class="dmg-move-name">${displayName}</span><span style="color:${catColor};font-size:.65rem">${mv.category === "physical" ? "⚔️ Fís." : mv.category === "special" ? "🔮 Esp." : "💫 Est."}</span></div><div class="dmg-status dmg-immune">Sin datos</div></div>`;
         if (res.status)
-          return `<div class="dmg-move"><div class="dmg-move-top"><span class="mv-type" style="background:${tc.bg};color:${tc.tx}">${TYPE_ES[mv.type] || mv.type}</span><span class="dmg-move-name">${mv.name}</span><span style="color:#a7db8d;font-size:.65rem">💫 Estado</span></div><div class="dmg-status dmg-immune">Movimiento de estado — no hace daño directo</div></div>`;
+          return `<div class="dmg-move"><div class="dmg-move-top"><span class="mv-type" style="background:${tc.bg};color:${tc.tx}">${TYPE_ES[mv.type] || mv.type}</span><span class="dmg-move-name">${displayName}</span><span style="color:#a7db8d;font-size:.65rem">💫 Estado → Max Guard</span></div><div class="dmg-status dmg-immune">Max Guard — protege de todos los movimientos</div></div>`;
         if (res.immune)
-          return `<div class="dmg-move"><div class="dmg-move-top"><span class="mv-type" style="background:${tc.bg};color:${tc.tx}">${TYPE_ES[mv.type] || mv.type}</span><span class="dmg-move-name">${mv.name}</span></div><div class="dmg-status dmg-immune">🚫 Sin efecto (inmunidad de tipo)</div></div>`;
+          return `<div class="dmg-move"><div class="dmg-move-top"><span class="mv-type" style="background:${tc.bg};color:${tc.tx}">${TYPE_ES[mv.type] || mv.type}</span><span class="dmg-move-name">${displayName}</span></div><div class="dmg-status dmg-immune">🚫 Sin efecto (inmunidad de tipo)</div></div>`;
         if (res.ohko === true) {
           // TRUE OHKO move (Fissure, Guillotine, Horn Drill, Sheer Cold)
           let oTurnBadgeTop = "",
@@ -8916,7 +9393,7 @@
           return `<div class="dmg-move">
       <div class="dmg-move-top">
         <span class="mv-type" style="background:${tc.bg};color:${tc.tx}">${TYPE_ES[mv.type] || mv.type}</span>
-        <span class="dmg-move-name">${mv.name}</span>
+        <span class="dmg-move-name">${displayName}</span>
         ${oTurnBadgeTop}
         <span class="eff-badge eff-2se">OKHO Instantáneo</span>
         <span style="color:${catColor};font-size:.65rem;margin-left:auto">${mv.category === "physical" ? "⚔️" : mv.category === "special" ? "🔮" : "💫"}</span>
@@ -8927,7 +9404,7 @@
     </div>`;
         }
         if (res.zHitsImmune)
-          return `<div class="dmg-move"><div class="dmg-move-top"><span class="mv-type" style="background:${tc.bg};color:${tc.tx}">${TYPE_ES[mv.type] || mv.type}</span><span class="dmg-move-name">${mv.name}</span><span class="eff-badge eff-nve">Inmune</span><span class="badge-z">Z</span></div><div class="dmg-status" style="color:#ffe040">⚡ Z-Move vs tipo inmune — hace exactamente <b>1 HP</b> de daño</div></div>`;
+          return `<div class="dmg-move"><div class="dmg-move-top"><span class="mv-type" style="background:${tc.bg};color:${tc.tx}">${TYPE_ES[mv.type] || mv.type}</span><span class="dmg-move-name">${displayName}</span><span class="eff-badge eff-nve">Inmune</span><span class="special-move-badge badge-z">⚡ Z</span></div><div class="dmg-status" style="color:#ffe040">⚡ Z-Move vs tipo inmune — hace exactamente <b>1 HP</b> de daño</div></div>`;
 
         // Normal damage result
         const isMulti = res.hits && (res.hits.length > 1 || res.hits[0] > 1);
@@ -9013,7 +9490,7 @@
         return `<div class="dmg-move">
     <div class="dmg-move-top">
       <span class="mv-type" style="background:${tc.bg};color:${tc.tx}">${TYPE_ES[mv.type] || mv.type}</span>
-      <span class="dmg-move-name">${mv.name}</span>
+      <span class="dmg-move-name">${displayName}</span>
       ${turnBadgeTopRow}
       ${res.seBoostActive ? `<span class="turn-badge turn-se-boost">🔥 ×4/3 BONO SE</span>` : res.seBoostMove ? `<span class="turn-badge turn-se-boost-warn">⚠️ sin bono SE</span>` : ""}
       ${res.isDefBased ? `<span class="turn-badge turn-def-boost">🛡️ USA TU DEF como ATQ</span>` : ""}
@@ -9037,7 +9514,8 @@
       ${res.stabInfo ? `<span class="badge-stab">⭐ ${res.stabInfo}</span>` : ""}
       ${res.weatherInfo && !res.weatherInfo.includes("0.5") ? `<span class="badge-weather-boost">${res.weatherInfo}</span>` : ""}
       ${res.weatherInfo && res.weatherInfo.includes("0.5") ? `<span class="badge-weather-nerf">${res.weatherInfo}</span>` : ""}
-      <span style="color:${catColor};font-size:.65rem;margin-left:auto">${mv.category === "physical" ? "⚔️" : mv.category === "special" ? "🔮" : "💫"} ${res.bp ? `BP:${res.bp}` : ""}</span>
+      ${zMoveName ? `<span class="special-move-badge badge-z">⚡ Z</span>` : ""}
+      <span style="color:${catColor};font-size:.65rem;margin-left:auto">${mv.category === "physical" ? "⚔️" : mv.category === "special" ? "🔮" : "💫"} ${res.bp ? `<span style="color:#ffe066;font-weight:700;font-family:'Orbitron',monospace;text-shadow:0 0 6px rgba(255,220,60,.45)">BP:${res.bp}</span>` : ""}</span>
     </div>
     <div class="dmg-bar-bg"><div class="dmg-bar-fill" style="width:${barW}%;background:${barColor}"></div></div>
     <div class="dmg-numbers">
@@ -9124,7 +9602,7 @@
         const rawWords = raw ? raw.split(/\s+/) : [];
         const qWordsRev = rawWords.length > 1 ? [...rawWords].reverse().join("-") : "";
 
-        const basePool = gs.pList;
+        const basePool = gs.pList.filter(p => !p.name.endsWith("-gmax"));
         const formPool = Object.entries(FORM_SPRITE_IDS).map(([name, id]) => ({ name, id }));
 
         let results;
@@ -9207,6 +9685,8 @@
           if (b) b.value = "";
           updateMoveInfo(s, i, null);
         });
+        // Reset mega form choice for fresh selection
+        gs[s].megaForm = null;
         loadPokemon(s, name);
       }
 
@@ -9347,6 +9827,8 @@
         buildPanel("A");
         buildPanel("B");
         buildTeraSelects();
+        updateMechUI("A");
+        updateMechUI("B");
         setLevel("A", 100);
         setLevel("B", 100);
         if (gs.pList && gs.pList.length > 0) {
