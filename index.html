@@ -2102,18 +2102,20 @@
       .mega-form-sel {
         display: inline-flex !important;
         align-items: center;
+        align-self: stretch;
         justify-content: center;
         gap: 0.25rem;
         overflow: hidden;
         max-width: 0;
-        padding: 0.28rem 0;
+        padding: 0;
         opacity: 0;
         pointer-events: none;
-        /* Negative margin cancels the parent flex gap exactly */
         margin-left: -0.35rem;
         border-radius: 0 20px 20px 0;
-        border: 1.5px solid #60d0ff;
-        border-left: 1px solid rgba(96,208,255,0.25);
+        border: none;
+        outline: 1.5px solid #60d0ff;
+        outline-offset: -1px;
+        clip-path: inset(0 0 0 4px); /* hide the left part of outline */
         background: rgba(96,208,255,0.12);
         color: #60d0ff;
         font-family: "Exo 2", sans-serif;
@@ -2122,11 +2124,11 @@
         cursor: pointer;
         white-space: nowrap;
         box-sizing: border-box;
-        transition: max-width 0.25s ease, opacity 0.2s ease, padding 0.2s ease;
+        transition: max-width 0.25s ease, opacity 0.2s ease;
       }
       .mega-form-sel.show {
         max-width: 90px;
-        padding: 0.28rem 0.55rem;
+        padding: 0 0.55rem;
         opacity: 1;
         pointer-events: auto;
       }
@@ -2525,7 +2527,7 @@
           display: flex;
           flex-direction: column;
           gap: 0.35rem;
-          padding: 0.45rem 0.75rem;
+          padding: 0.3rem 0.75rem 0.45rem;
         }
         .mech-title {
           text-align: center;
@@ -2533,12 +2535,18 @@
           letter-spacing: 0.8px;
           margin-bottom: 0.05rem;
         }
-        /* Cada grupo (LADO A / LADO B) en una fila flex */
+        /* Cada grupo (LADO A / LADO B): tarjeta idéntica */
         .mech-group {
           display: flex;
           flex-wrap: wrap;
           align-items: center;
           gap: 0.28rem;
+          background: var(--card2);
+          border: 1px solid var(--bhi);
+          border-radius: 8px;
+          padding: 0.4rem 0.6rem;
+          width: 100%;
+          box-sizing: border-box;
         }
         .mech-group > .mech-lbl {
           flex-shrink: 0;
@@ -2557,6 +2565,9 @@
           padding: 0.2rem 0.3rem;
           max-width: 78px;
           margin-left: 0.1rem;
+        }
+        .mega-form-sel {
+          margin-left: -0.28rem;
         }
       }
 
@@ -2714,18 +2725,22 @@
     </div>
     <style>
       #mechB-anchor { display: contents; }
-      #mechB-anchor .mech-group {
-        background: var(--card2);
-        border: 1px solid var(--bhi);
-        border-radius: 8px;
-        padding: 0.4rem 0.6rem;
-        margin: 0.2rem 0;
-        flex-wrap: wrap;
-        gap: 0.28rem;
-        display: flex;
-        align-items: center;
-        width: 100%;
-        box-sizing: border-box;
+      @media (max-width: 600px) {
+        #mechB-anchor {
+          display: block;
+          /* Cancel arena's 1rem side padding, then add mech-bar's 0.75rem */
+          margin-left: -1rem;
+          margin-right: -1rem;
+          padding-left: 0.75rem;
+          padding-right: 0.75rem;
+          margin-top: 0.5rem;
+          margin-bottom: 0.5rem;
+          box-sizing: border-box;
+        }
+        #mechB-anchor .mech-group {
+          margin: 0;
+          width: 100%;
+        }
       }
     </style>
     <script>
@@ -3205,6 +3220,55 @@
           g: "Bayas",
           rb: "fairy",
         },
+        // ── Mega Stones ──
+        { k: "abomasite", n: "Abomasite", g: "Megapiedra" },
+        { k: "absolite", n: "Absolite", g: "Megapiedra" },
+        { k: "aerodactylite", n: "Aerodactylite", g: "Megapiedra" },
+        { k: "aggronite", n: "Aggronite", g: "Megapiedra" },
+        { k: "alakazite", n: "Alakazite", g: "Megapiedra" },
+        { k: "altarianite", n: "Altarianite", g: "Megapiedra" },
+        { k: "ampharosite", n: "Ampharosite", g: "Megapiedra" },
+        { k: "audinite", n: "Audinite", g: "Megapiedra" },
+        { k: "banettite", n: "Banettite", g: "Megapiedra" },
+        { k: "beedrillite", n: "Beedrillite", g: "Megapiedra" },
+        { k: "blastoisinite", n: "Blastoisinite", g: "Megapiedra" },
+        { k: "blazikenite", n: "Blazikenite", g: "Megapiedra" },
+        { k: "cameruptite", n: "Cameruptite", g: "Megapiedra" },
+        { k: "charizardite-x", n: "Charizardita X", g: "Megapiedra" },
+        { k: "charizardite-y", n: "Charizardita Y", g: "Megapiedra" },
+        { k: "diancite", n: "Diancite", g: "Megapiedra" },
+        { k: "galladite", n: "Galladite", g: "Megapiedra" },
+        { k: "garchompite", n: "Garchompite", g: "Megapiedra" },
+        { k: "gardevoirite", n: "Gardevoirite", g: "Megapiedra" },
+        { k: "gengarite", n: "Gengarite", g: "Megapiedra" },
+        { k: "glalitite", n: "Glalitite", g: "Megapiedra" },
+        { k: "gyaradosite", n: "Gyaradosite", g: "Megapiedra" },
+        { k: "heracronite", n: "Heracronite", g: "Megapiedra" },
+        { k: "houndoominite", n: "Houndoominite", g: "Megapiedra" },
+        { k: "kangaskhanite", n: "Kangaskhanite", g: "Megapiedra" },
+        { k: "latiasite", n: "Latiasite", g: "Megapiedra" },
+        { k: "latiosite", n: "Latiosite", g: "Megapiedra" },
+        { k: "lopunnite", n: "Lopunnite", g: "Megapiedra" },
+        { k: "lucarionite", n: "Lucarionite", g: "Megapiedra" },
+        { k: "manectite", n: "Manectite", g: "Megapiedra" },
+        { k: "mawilite", n: "Mawilite", g: "Megapiedra" },
+        { k: "medichamite", n: "Medichamite", g: "Megapiedra" },
+        { k: "metagrossite", n: "Metagrossite", g: "Megapiedra" },
+        { k: "mewtwonite-x", n: "Mewtwoita X", g: "Megapiedra" },
+        { k: "mewtwonite-y", n: "Mewtwoita Y", g: "Megapiedra" },
+        { k: "pidgeotite", n: "Pidgeotite", g: "Megapiedra" },
+        { k: "pinsirite", n: "Pinsirite", g: "Megapiedra" },
+        { k: "rayquazite", n: "Rayquazite", g: "Megapiedra" },
+        { k: "sablenite", n: "Sablenite", g: "Megapiedra" },
+        { k: "salamencite", n: "Salamencite", g: "Megapiedra" },
+        { k: "sceptilite", n: "Sceptilite", g: "Megapiedra" },
+        { k: "scizorite", n: "Scizorite", g: "Megapiedra" },
+        { k: "sharpedonite", n: "Sharpedonite", g: "Megapiedra" },
+        { k: "slowbronite", n: "Slowbronite", g: "Megapiedra" },
+        { k: "steelixite", n: "Steelixite", g: "Megapiedra" },
+        { k: "swampertite", n: "Swampertite", g: "Megapiedra" },
+        { k: "tyranitarite", n: "Tyranitarite", g: "Megapiedra" },
+        { k: "venusaurite", n: "Venusaurite", g: "Megapiedra" },
       ];
       function getItem(k) {
         return ITEMS.find((i) => i.k === k) || ITEMS[0];
@@ -3221,6 +3285,7 @@
         Otro: "Other / Otro",
         Gema: "Gem / Gema",
         Bayas: "Berries / Bayas",
+        Megapiedra: "🔮 Mega Stones / Megapiedras",
       };
 
       const ITEM_ES = {
@@ -4264,30 +4329,117 @@
         });
       }
 
+      // Maps each mega-capable Pokémon to its mega stone key in ITEMS
+      const POKEMON_MEGA_STONE = {
+        abomasnow: "abomasite", absol: "absolite", aerodactyl: "aerodactylite",
+        aggron: "aggronite", alakazam: "alakazite", altaria: "altarianite",
+        ampharos: "ampharosite", audino: "audinite", banette: "banettite",
+        beedrill: "beedrillite", blastoise: "blastoisinite", blaziken: "blazikenite",
+        camerupt: "cameruptite", "charizard-x": "charizardite-x", "charizard-y": "charizardite-y",
+        charizard: "charizardite-x", // default, overridden by megaForm
+        diancie: "diancite", gallade: "galladite", garchomp: "garchompite",
+        gardevoir: "gardevoirite", gengar: "gengarite", glalie: "glalitite",
+        gyarados: "gyaradosite", heracross: "heracronite", houndoom: "houndoominite",
+        kangaskhan: "kangaskhanite", latias: "latiasite", latios: "latiosite",
+        lopunny: "lopunnite", lucario: "lucarionite", manectric: "manectite",
+        mawile: "mawilite", medicham: "medichamite", metagross: "metagrossite",
+        "mewtwo-x": "mewtwonite-x", "mewtwo-y": "mewtwonite-y",
+        mewtwo: "mewtwonite-x", // default, overridden by megaForm
+        pidgeot: "pidgeotite", pinsir: "pinsirite", rayquaza: "rayquazite",
+        sableye: "sablenite", salamence: "salamencite", sceptile: "sceptilite",
+        scizor: "scizorite", sharpedo: "sharpedonite", slowbro: "slowbronite",
+        steelix: "steelixite", swampert: "swampertite", tyranitar: "tyranitarite",
+        venusaur: "venusaurite",
+        // ZA Mega Pokémon — custom stones
+        "floette-mega": "floettite", floette: "floettite",
+        "meganium-mega": "meganiumite", meganium: "meganiumite",
+        "feraligatr-mega": "feraligatrite", feraligatr: "feraligatrite",
+        "froslass-mega": "froslasite", froslass: "froslasite",
+        "emboar-mega": "emboarite", emboar: "emboarite",
+        "chesnaught-mega": "chesnaughtite", chesnaught: "chesnaughtite",
+        "delphox-mega": "delphoxite", delphox: "delphoxite",
+        "greninja-mega": "greninjite", greninja: "greninjite",
+        "clefable-mega": "clefablite", clefable: "clefablite",
+        "victreebel-mega": "victreebelite", victreebel: "victreebelite",
+        "starmie-mega": "starmite", starmie: "starmite",
+        "dragonite-mega": "dragonite", // note: same name as the pokemon, but as item key
+        "skarmory-mega": "skarmite", skarmory: "skarmite",
+        "chimecho-mega": "chimechite", chimecho: "chimechite",
+        "excadrill-mega": "excadrillite", excadrill: "excadrillite",
+        "chandelure-mega": "chandelurite", chandelure: "chandelurite",
+        "golurk-mega": "golurkite", golurk: "golurkite",
+        "meowstic-mega": "meowstite", meowstic: "meowstite",
+        "hawlucha-mega": "hawluchite", hawlucha: "hawluchite",
+        "crabominable-mega": "crabominable-mega-stone", crabominable: "crabominable-mega-stone",
+        "drampa-mega": "drampa-mega-stone", drampa: "drampa-mega-stone",
+        "glimmora-mega": "glimmora-mega-stone", glimmora: "glimmora-mega-stone",
+        "scovillain-mega": "scovillain-mega-stone", scovillain: "scovillain-mega-stone",
+      };
+
+      function getMegaStoneForPoke(sd) {
+        if (!sd.poke) return null;
+        const name = sd.poke.isZAMega ? sd.poke.zaName : sd.poke.name;
+        if (DUAL_MEGA_POKEMON.has(sd.poke.name)) {
+          return POKEMON_MEGA_STONE[`${sd.poke.name}-${sd.megaForm || "x"}`] || null;
+        }
+        return POKEMON_MEGA_STONE[name] || null;
+      }
+
+      function applyMegaStone(s) {
+        const sd = gs[s];
+        const stone = getMegaStoneForPoke(sd);
+        if (stone) {
+          // Only save _prevItem the first time (don't overwrite on X↔Y switch)
+          if (sd._prevItem === undefined) sd._prevItem = sd.item;
+          sd.item = stone;
+          updateItemDDDisplay(s, stone);
+          const btn = document.getElementById(`itemBtn${s}`);
+          if (btn) {
+            btn.style.pointerEvents = "none";
+            btn.style.opacity = "0.7";
+            btn.title = "Objeto bloqueado durante Mega Evolución";
+          }
+        }
+      }
+
+      function removeMegaStone(s) {
+        const sd = gs[s];
+        // Restore previous item (whether or not current is a mega stone)
+        const restored = sd._prevItem !== undefined ? sd._prevItem : "none";
+        delete sd._prevItem;
+        sd.item = restored;
+        updateItemDDDisplay(s, restored);
+        // Unlock the item dropdown
+        const btn = document.getElementById(`itemBtn${s}`);
+        if (btn) {
+          btn.style.pointerEvents = "";
+          btn.style.opacity = "";
+          btn.title = "";
+        }
+      }
+
       function toggleMech(s, mech) {
         const sd = gs[s];
-        // Mutual exclusion: only one active mechanic per side
-        const mechs = ["tera", "z", "mega", "dmax"];
-        const mechMap = {
-          tera: "tera",
-          z: "zMove",
-          mega: "mega",
-          dmax: "dynamax",
-        };
+        const mechMap = { tera:"tera", z:"zMove", mega:"mega", dmax:"dynamax" };
         const wasActive = sd[mechMap[mech]];
+        const megaWasActive = sd.mega; // capture BEFORE deactivating all
         // Deactivate all
-        mechs.forEach((m) => (sd[mechMap[m]] = false));
+        ["tera","z","mega","dmax"].forEach(m => sd[mechMap[m]] = false);
+        // If mega was active, restore item
+        if (megaWasActive) removeMegaStone(s);
         // Toggle on if was off
         if (!wasActive) {
           sd[mechMap[mech]] = true;
-          // Default to "x" form for dual-mega Pokémon when first activating mega
-          if (mech === "mega" && sd.poke && DUAL_MEGA_POKEMON.has(sd.poke.name) && !sd.megaForm) {
-            sd.megaForm = "x";
+          if (mech === "mega") {
+            if (sd.poke && DUAL_MEGA_POKEMON.has(sd.poke.name) && !sd.megaForm) sd.megaForm = "x";
+            applyMegaStone(s);
           }
         }
         updateMechUI(s);
         updatePanelSprite(s);
+        updatePanelInfo(s);
         updateTypeMatchupDisplay(s);
+        updateAbilitySelect(s);
         calcFinalStats(s);
         updateStatDisplay(s);
         updateAll();
@@ -4324,6 +4476,16 @@
           const btn = document.getElementById(id);
           if (btn) {
             btn.classList.toggle(classMap[mech], !!stateMap[mech]);
+            // Lock mega button for ZA pokemon (always mega)
+            if (mech === "mega" && sd.poke?.isZAMega) {
+              btn.style.pointerEvents = "none";
+              btn.style.opacity = "0.75";
+              btn.title = "Este Pokémon es siempre Mega";
+            } else if (mech === "mega") {
+              btn.style.pointerEvents = "";
+              btn.style.opacity = "";
+              btn.title = "Mega Evolución (Gen 6)";
+            }
           }
         });
         // Show/hide tera type selector
@@ -4814,7 +4976,7 @@
         "chesnaught-mega": "Chesnaught Mega",
         "delphox-mega": "Delphox Mega",
         "greninja-mega": "Greninja Mega",
-        "floette-mega": "Floette Mega",
+        "floette-mega": "Floette Eternal Mega",
         "meowstic-mega": "Meowstic Mega",
         "hawlucha-mega": "Hawlucha Mega",
         "crabominable-mega": "Crabominable Mega",
@@ -4918,6 +5080,7 @@
         "delphox-mega": 655,
         "greninja-mega": 658,
         "floette-mega": 670,
+        "floette-eternal": 670, // Floette Eternal uses same base ID, sprite loaded from PokeAPI form
         "meowstic-mega": 678,
         "hawlucha-mega": 701,
         "crabominable-mega": 740,
@@ -4936,10 +5099,15 @@
         if (!sd || !sd.poke) return [];
         if (sd.tera) return [sd.teraType];
         if (sd.mega) {
+          // ZA pokemon: use zaName to look up types from ZA_MEGA_POKEMON
+          if (sd.poke.isZAMega && sd.poke.zaName) {
+            const za = ZA_MEGA_POKEMON[sd.poke.zaName];
+            if (za?.types) return za.types;
+          }
           const megaKey = DUAL_MEGA_POKEMON.has(sd.poke.name)
             ? sd.poke.name + "-" + (sd.megaForm || "x")
             : sd.poke.name;
-          const mk = MEGA_DATA[megaKey];
+          const mk = MEGA_DATA[megaKey] || MEGA_DATA[megaKey.replace(/-mega$/, "")];
           if (mk && mk.types) return mk.types;
         }
         return sd.poke.types;
@@ -4990,8 +5158,13 @@
       function cycleMegaForm(s) {
         const sd = gs[s];
         const newForm = (sd.megaForm || "x") === "x" ? "y" : "x";
+        sd.megaForm = newForm;
         setMegaForm(s, newForm);
         updateMegaFormDDDisplay(s, newForm);
+        if (sd.mega) {
+          applyMegaStone(s);
+          updateAbilitySelect(s);
+        }
       }
 
       // Keep pickMegaForm for any legacy calls
@@ -5362,6 +5535,17 @@
       function getEffectiveAbility(s) {
         const sd = gs[s];
         if (!sd) return "none";
+        if (sd.mega && sd.poke) {
+          if (sd.poke.isZAMega) {
+            const za = ZA_MEGA_POKEMON[sd.poke.zaName];
+            if (za?.abilities?.[0]) return za.abilities[0];
+          }
+          const megaKey = DUAL_MEGA_POKEMON.has(sd.poke.name)
+            ? sd.poke.name + "-" + (sd.megaForm || "x")
+            : sd.poke.name;
+          const mk = MEGA_DATA[megaKey] || MEGA_DATA[megaKey.replace(/-mega$/, "")];
+          if (mk?.ability) return mk.ability;
+        }
         return sd._activeAbility || sd.ability || "none";
       }
       function getAbilityDisplayName(ab) {
@@ -5705,13 +5889,19 @@
         let baseStats = sd.poke.base;
         let activeAbility = sd.ability;
         if (sd.mega) {
-          const megaKey = DUAL_MEGA_POKEMON.has(sd.poke.name)
-            ? sd.poke.name + "-" + (sd.megaForm || "x")
-            : sd.poke.name;
-          const mk = MEGA_DATA[megaKey];
-          if (mk) {
-            baseStats = mk.base;
-            if (mk.ability) activeAbility = mk.ability;
+          if (sd.poke.isZAMega) {
+            // ZA pokemon: base stats ARE already the mega stats, just get the ability
+            const za = ZA_MEGA_POKEMON[sd.poke.zaName];
+            if (za?.abilities?.[0]) activeAbility = za.abilities[0];
+          } else {
+            const megaKey = DUAL_MEGA_POKEMON.has(sd.poke.name)
+              ? sd.poke.name + "-" + (sd.megaForm || "x")
+              : sd.poke.name;
+            const mk = MEGA_DATA[megaKey] || MEGA_DATA[megaKey.replace(/-mega$/, "")];
+            if (mk) {
+              baseStats = mk.base;
+              if (mk.ability) activeAbility = mk.ability;
+            }
           }
         }
 
@@ -6314,6 +6504,7 @@
           id: 670, types: ["fairy"],
           base: { hp: 74, attack: 85, defense: 87, "special-attack": 155, "special-defense": 148, speed: 102 },
           abilities: ["fairy-aura"], weight: 100.8,
+          baseName: "floette-eternal", // base is Floette Eternal, not regular Floette
         },
         "meganium-mega": {
           id: 154, types: ["grass", "fairy"],
@@ -7452,6 +7643,11 @@
             gs._autoSeq = sd._autoSeq;
             sd._autoOrder = sd._autoSeq;
             if (sd.poke.abilities.length > 0 && sd.ability === "none") sd.ability = sd.poke.abilities[0];
+            // Auto-activate mega for cached ZA pokemon
+            if (sd.poke.isZAMega) {
+              sd.mega = true; sd.tera = false; sd.zMove = false; sd.dynamax = false;
+              applyMegaStone(s);
+            }
             const wSel = document.getElementById("weatherSel");
             const tSel = document.getElementById("terrainSel");
             if (!gs.weatherAutoSource && gs.weather !== "none") { gs.weather = "none"; if (wSel) wSel.value = "none"; }
@@ -7475,13 +7671,17 @@
           if (!r.ok) {
             const zaStatic = ZA_MEGA_POKEMON[name];
             if (zaStatic) {
+              // Strip "-mega" to get the base pokemon name, or use explicit baseName
+              const baseName = zaStatic.baseName || name.replace(/-mega$/, "");
               sd.poke = {
                 id: zaStatic.id,
-                name: name,
-                types: zaStatic.types,
+                name: baseName,        // store as base name (e.g. "floette-eternal")
+                zaName: name,          // keep full slug for MEGA_DATA lookup
+                types: zaStatic.types, // these are the BASE types before mega
                 base: zaStatic.base,
                 abilities: zaStatic.abilities,
                 weight: zaStatic.weight,
+                isZAMega: true,        // flag so we know it auto-megas
               };
               const _zaExtra = FORM_EXTRA_MOVES[name] || [];
               sd.pokeMoves = [..._zaExtra].sort();
@@ -7491,6 +7691,12 @@
               if (sd.poke.abilities.length > 0 && sd.ability === "none") {
                 sd.ability = sd.poke.abilities[0];
               }
+              // Auto-activate mega for ZA pokemon — they are already in mega form
+              sd.mega = true;
+              sd.tera = false; sd.zMove = false; sd.dynamax = false;
+              applyMegaStone(s);
+              // Cache to localStorage so next selection is instant
+              lsSet(`poke:${name}`, { poke: sd.poke, pokeMoves: sd.pokeMoves });
               const wSel = document.getElementById("weatherSel");
               const tSel = document.getElementById("terrainSel");
               if (!gs.weatherAutoSource && gs.weather !== "none") { gs.weather = "none"; if (wSel) wSel.value = "none"; }
@@ -7540,6 +7746,11 @@
           const tSel = document.getElementById("terrainSel");
           if (!gs.weatherAutoSource && gs.weather !== "none") { gs.weather = "none"; if (wSel) wSel.value = "none"; }
           if (!gs.terrainAutoSource && gs.terrain !== "none") { gs.terrain = "none"; if (tSel) tSel.value = "none"; }
+          // Reset all mechanics when pokemon changes
+          if (sd.mega) removeMegaStone(s);
+          sd.mega = false; sd.tera = false; sd.zMove = false; sd.dynamax = false;
+          sd.megaForm = null;
+          updateAbilitySelect(s); // restore ability selector before updateMechUI
           updatePanelSprite(s);
           updatePanelInfo(s);
           updateMechUI(s);
@@ -8343,6 +8554,10 @@
     </div>`;
         buildNatureSelect(s);
         buildItemSelect(s);
+        // Re-lock item if mega is still active after panel rebuild
+        if (gs[s] && gs[s].mega) {
+          setTimeout(() => applyMegaStone(s), 0);
+        }
       }
 
       function buildNatureSelect(s) {
@@ -8748,11 +8963,16 @@
 
         // Mega sprite — swap to mega form sprite
         if (sd.mega) {
-          let megaKey = sd.poke.name + "-mega";
-          if (DUAL_MEGA_POKEMON.has(sd.poke.name)) {
+          let megaKey;
+          if (sd.poke.isZAMega) {
+            // ZA pokemon: use zaName directly as the sprite key (e.g. "floette-mega")
+            megaKey = sd.poke.zaName;
+          } else if (DUAL_MEGA_POKEMON.has(sd.poke.name)) {
             megaKey = sd.poke.name + "-mega-" + (sd.megaForm || "x");
+          } else {
+            megaKey = sd.poke.name + "-mega";
           }
-          if (FORM_SPRITE_IDS[megaKey]) targetId = megaKey; // string key → getSpriteId resolves numeric ID
+          if (FORM_SPRITE_IDS[megaKey]) targetId = megaKey;
         }
 
         // Gigamax sprite overrides mega when Dynamax is active
@@ -8782,6 +9002,7 @@
       }
 
       function clearPokemon(s) {
+        removeMegaStone(s); // unlock item before resetting state
         const prev = gs[s];
         gs[s] = mkSide();
         gs[s].level = prev.level;
@@ -8851,9 +9072,22 @@
       function updatePanelInfo(s) {
         const sd = gs[s];
         if (!sd.poke) return;
-        document.getElementById(`pName${s}`).textContent = fmtName(
-          sd.poke.name,
-        );
+        // Compute display name based on mega state
+        let displayName = sd.poke.name;
+        if (sd.mega) {
+          if (sd.poke.isZAMega && sd.poke.zaName) {
+            displayName = sd.poke.zaName; // e.g. "floette-mega"
+          } else if (DUAL_MEGA_POKEMON.has(sd.poke.name)) {
+            displayName = sd.poke.name + "-mega-" + (sd.megaForm || "x"); // e.g. "charizard-mega-x"
+          } else {
+            displayName = sd.poke.name + "-mega"; // e.g. "venusaur-mega"
+          }
+          // Fall back to base name if no display entry exists
+          if (!POKE_ES[displayName] && !FORM_SPRITE_IDS[displayName]) {
+            displayName = sd.poke.name;
+          }
+        }
+        document.getElementById(`pName${s}`).textContent = fmtName(displayName);
         document.getElementById(`pId${s}`).textContent = padId(sd.poke.id);
         document.getElementById(`pTypes${s}`).innerHTML = effectiveTypes(sd)
           .map((t) => {
@@ -8863,20 +9097,12 @@
           .join("");
         // Update title
         if (s === "A") {
-          document.getElementById("dmgTitleA").textContent = fmtName(
-            sd.poke.name,
-          );
-          document.getElementById("dmgTitleA2").textContent = fmtName(
-            sd.poke.name,
-          );
+          document.getElementById("dmgTitleA").textContent = fmtName(displayName);
+          document.getElementById("dmgTitleA2").textContent = fmtName(displayName);
         }
         if (s === "B") {
-          document.getElementById("dmgTitleB").textContent = fmtName(
-            sd.poke.name,
-          );
-          document.getElementById("dmgTitleB2").textContent = fmtName(
-            sd.poke.name,
-          );
+          document.getElementById("dmgTitleB").textContent = fmtName(displayName);
+          document.getElementById("dmgTitleB2").textContent = fmtName(displayName);
         }
         // Type matchup display
         updateTypeMatchupDisplay(s);
@@ -8905,6 +9131,29 @@
         const sd = gs[s];
         if (!sd.poke) return;
         const sel = document.getElementById(`abl${s}`);
+        // When mega is active, show only the mega ability (locked) without changing sd.ability
+        if (sd.mega) {
+          let megaAbility = null;
+          if (sd.poke.isZAMega) {
+            const za = ZA_MEGA_POKEMON[sd.poke.zaName];
+            megaAbility = za?.abilities?.[0] || null;
+          } else {
+            const megaKey = DUAL_MEGA_POKEMON.has(sd.poke.name)
+              ? sd.poke.name + "-" + (sd.megaForm || "x")
+              : sd.poke.name;
+            const mk = MEGA_DATA[megaKey] || MEGA_DATA[megaKey.replace(/-mega$/, "")];
+            megaAbility = mk?.ability || null;
+          }
+          if (megaAbility) {
+            sel.innerHTML = `<option value="${megaAbility}">${fmtAbilBilingual(megaAbility)}</option>`;
+            sel.value = megaAbility;
+            sel.disabled = true;
+            updateAbilityDescription(s);
+            return;
+          }
+        }
+        // Normal case: restore base pokemon abilities
+        sel.disabled = false;
         sel.innerHTML =
           '<option value="none">— Sin habilidad —</option>' +
           sd.poke.abilities
@@ -9704,7 +9953,7 @@
         const terrainSources = [];
         for (const side of ["A", "B"]) {
           const sd = gs[side];
-          const ab = sd.ability;
+          const ab = getEffectiveAbility(side);
           if (WEATHER_ABL[ab])
             weatherSources.push({ cond: WEATHER_ABL[ab], ab, side });
           if (TERRAIN_ABL[ab])
