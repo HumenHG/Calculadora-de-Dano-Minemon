@@ -512,6 +512,36 @@
             border-box;
         animation: rspin 4s linear infinite;
       }
+      .sprite-ring.za-mega {
+        border: 2px solid transparent;
+        background:
+          linear-gradient(var(--card), var(--card)) padding-box,
+          conic-gradient(
+              from var(--angle),
+              #ffd700 0%,
+              #fff8b0 30%,
+              #e8a000 60%,
+              #ffd700 100%
+            )
+            border-box;
+        animation: rspin 3s linear infinite;
+      }
+      .za-mega-badge {
+        position: absolute;
+        bottom: -2px;
+        right: -2px;
+        background: linear-gradient(135deg, #ffd700, #e8a000);
+        color: #1a1a2e;
+        font-size: 0.48rem;
+        font-weight: 900;
+        letter-spacing: 0.04em;
+        padding: 1px 4px;
+        border-radius: 4px;
+        pointer-events: none;
+        z-index: 2;
+        white-space: nowrap;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+      }
       @keyframes rspin {
         to {
           --angle: 360deg;
@@ -3269,6 +3299,30 @@
         { k: "swampertite", n: "Swampertite", g: "Megapiedra" },
         { k: "tyranitarite", n: "Tyranitarite", g: "Megapiedra" },
         { k: "venusaurite", n: "Venusaurite", g: "Megapiedra" },
+        // ── Megapiedras ZA (Pokémon Legends: Z-A) ──
+        { k: "floettite",               n: "Floettite",               g: "Megapiedra ZA" },
+        { k: "meganiumite",             n: "Meganiumite",             g: "Megapiedra ZA" },
+        { k: "feraligatrite",           n: "Feraligatrite",           g: "Megapiedra ZA" },
+        { k: "froslasite",              n: "Froslasite",              g: "Megapiedra ZA" },
+        { k: "emboarite",               n: "Emboarite",               g: "Megapiedra ZA" },
+        { k: "chesnaughtite",           n: "Chesnaughtite",           g: "Megapiedra ZA" },
+        { k: "delphoxite",              n: "Delphoxite",              g: "Megapiedra ZA" },
+        { k: "greninjite",              n: "Greninjite",              g: "Megapiedra ZA" },
+        { k: "clefablite",              n: "Clefablite",              g: "Megapiedra ZA" },
+        { k: "victreebelite",           n: "Victreebelite",           g: "Megapiedra ZA" },
+        { k: "starmite",                n: "Starmite",                g: "Megapiedra ZA" },
+        { k: "dragonite",               n: "Dragonite (Mega Stone)",  g: "Megapiedra ZA" },
+        { k: "skarmite",                n: "Skarmite",                g: "Megapiedra ZA" },
+        { k: "chimechite",              n: "Chimechite",              g: "Megapiedra ZA" },
+        { k: "excadrillite",            n: "Excadrillite",            g: "Megapiedra ZA" },
+        { k: "chandelurite",            n: "Chandelurite",            g: "Megapiedra ZA" },
+        { k: "golurkite",               n: "Golurkite",               g: "Megapiedra ZA" },
+        { k: "meowstite",               n: "Meowstite",               g: "Megapiedra ZA" },
+        { k: "hawluchite",              n: "Hawluchite",              g: "Megapiedra ZA" },
+        { k: "crabominable-mega-stone", n: "Crabominable Mega Stone", g: "Megapiedra ZA" },
+        { k: "drampa-mega-stone",       n: "Drampa Mega Stone",       g: "Megapiedra ZA" },
+        { k: "scovillain-mega-stone",   n: "Scovillain Mega Stone",   g: "Megapiedra ZA" },
+        { k: "glimmora-mega-stone",     n: "Glimmora Mega Stone",     g: "Megapiedra ZA" },
       ];
       function getItem(k) {
         return ITEMS.find((i) => i.k === k) || ITEMS[0];
@@ -3286,6 +3340,7 @@
         Gema: "Gem / Gema",
         Bayas: "Berries / Bayas",
         Megapiedra: "🔮 Mega Stones / Megapiedras",
+        "Megapiedra ZA": "⚡ Mega Stones ZA / Megapiedras ZA",
       };
 
       const ITEM_ES = {
@@ -4351,7 +4406,7 @@
         steelix: "steelixite", swampert: "swampertite", tyranitar: "tyranitarite",
         venusaur: "venusaurite",
         // ZA Mega Pokémon — custom stones
-        "floette-mega": "floettite", floette: "floettite",
+        "floette-mega": "floettite", "floette-eternal": "floettite",
         "meganium-mega": "meganiumite", meganium: "meganiumite",
         "feraligatr-mega": "feraligatrite", feraligatr: "feraligatrite",
         "froslass-mega": "froslasite", froslass: "froslasite",
@@ -4427,10 +4482,25 @@
         ["tera","z","mega","dmax"].forEach(m => sd[mechMap[m]] = false);
         // If mega was active, restore item
         if (megaWasActive) removeMegaStone(s);
+        // Si se desactiva mega en un ZA mega, recargar la forma base
+        if (wasActive && mech === "mega" && sd.poke?.isZAMega) {
+          const baseName = sd.poke.name; // e.g. "floette-eternal"
+          loadPokemon(s, baseName);
+          return;
+        }
         // Toggle on if was off
         if (!wasActive) {
           sd[mechMap[mech]] = true;
           if (mech === "mega") {
+            // Si el pokémon es la base de una ZA mega, cargar la forma ZA completa
+            // (ej. floette-eternal → floette-mega con sus stats/habilidades correctas)
+            const zaName = sd.poke && BASE_TO_ZA_MEGA[sd.poke.name];
+            if (zaName && !sd.poke.isZAMega) {
+              // Dejar mega=false (loadPokemon lo pondrá a true automáticamente)
+              sd.mega = false;
+              loadPokemon(s, zaName);
+              return;
+            }
             if (sd.poke && DUAL_MEGA_POKEMON.has(sd.poke.name) && !sd.megaForm) sd.megaForm = "x";
             applyMegaStone(s);
           }
@@ -4476,15 +4546,28 @@
           const btn = document.getElementById(id);
           if (btn) {
             btn.classList.toggle(classMap[mech], !!stateMap[mech]);
-            // Lock mega button for ZA pokemon (always mega)
-            if (mech === "mega" && sd.poke?.isZAMega) {
-              btn.style.pointerEvents = "none";
-              btn.style.opacity = "0.75";
-              btn.title = "Este Pokémon es siempre Mega";
-            } else if (mech === "mega") {
-              btn.style.pointerEvents = "";
-              btn.style.opacity = "";
-              btn.title = "Mega Evolución (Gen 6)";
+            if (mech === "mega") {
+              // Determinar si este pokémon puede megaevolucionar
+              const canMega = sd.poke && (
+                sd.poke.isZAMega ||
+                BASE_TO_ZA_MEGA[sd.poke.name] ||
+                getMegaStoneForPoke(sd) !== null
+              );
+              if (!canMega) {
+                // Sin mega posible: deshabilitar botón visualmente
+                btn.style.pointerEvents = "none";
+                btn.style.opacity = "0.35";
+                btn.title = "Este Pokémon no puede Megaevolucionar";
+                sd.mega = false; // asegurar que no quede activo
+              } else if (sd.poke?.isZAMega) {
+                btn.style.pointerEvents = "";
+                btn.style.opacity = "";
+                btn.title = "Mega Evolución ZA (desactiva para volver a la forma base)";
+              } else {
+                btn.style.pointerEvents = "";
+                btn.style.opacity = "";
+                btn.title = "Mega Evolución (Gen 6)";
+              }
             }
           }
         });
@@ -5062,31 +5145,30 @@
         "diancie-mega": 10080,
         "pidgeot-mega": 10081,
         "beedrill-mega": 10082,
-        // ── Nuevas Mega Evoluciones de Legends: Z-A (se usan los IDs base mientras PokeAPI no tenga los sprites) ──
-        "clefable-mega": 36,
-        "victreebel-mega": 71,
-        "starmie-mega": 121,
-        "dragonite-mega": 149,
-        "meganium-mega": 154,
-        "feraligatr-mega": 160,
-        "froslass-mega": 478,
-        "skarmory-mega": 227,
-        "chimecho-mega": 358,
-        "emboar-mega": 500,
-        "excadrill-mega": 530,
-        "chandelure-mega": 609,
-        "golurk-mega": 623,
-        "chesnaught-mega": 652,
-        "delphox-mega": 655,
-        "greninja-mega": 658,
-        "floette-mega": 670,
-        "floette-eternal": 670, // Floette Eternal uses same base ID, sprite loaded from PokeAPI form
-        "meowstic-mega": 678,
-        "hawlucha-mega": 701,
-        "crabominable-mega": 740,
-        "drampa-mega": 780,
-        "scovillain-mega": 953,
-        "glimmora-mega": 970,
+        // ── Nuevas Mega Evoluciones de Legends: Z-A ──
+        "clefable-mega":      10278,
+        "victreebel-mega":    10279,
+        "starmie-mega":       10280,
+        "dragonite-mega":     10281,
+        "meganium-mega":      10282,
+        "feraligatr-mega":    10283,
+        "skarmory-mega":      10284,
+        "froslass-mega":      10285,
+        "emboar-mega":        10286,
+        "excadrill-mega":     10287,
+        "chandelure-mega":    10291,
+        "chesnaught-mega":    10292,
+        "delphox-mega":       10293,
+        "greninja-mega":      10294,
+        "floette-mega":       10296,
+        "hawlucha-mega":      10300,
+        "drampa-mega":        10302,
+        "chimecho-mega":      10306,
+        "golurk-mega":        10313,
+        "meowstic-mega":      10314,
+        "crabominable-mega":  10315,
+        "scovillain-mega":    10320,
+        "glimmora-mega":      10321,
         "zacian-crowned": 10286,
         "zamazenta-crowned": 10287,
       };
@@ -6501,7 +6583,7 @@
       // Se usan como fallback cuando la petición a PokeAPI devuelve 404
       const ZA_MEGA_POKEMON = {
         "floette-mega": {
-          id: 670, types: ["fairy"],
+          id: 10061, types: ["fairy"],
           base: { hp: 74, attack: 85, defense: 87, "special-attack": 155, "special-defense": 148, speed: 102 },
           abilities: ["fairy-aura"], weight: 100.8,
           baseName: "floette-eternal", // base is Floette Eternal, not regular Floette
@@ -6617,6 +6699,14 @@
           abilities: ["adaptability"], weight: 45.0,
         },
       };
+
+      // ── Mapa inverso: baseName → zaName (para detectar bases de ZA mega) ──
+      // Permite que al pulsar Mega con Floette Eternal cargue "floette-mega" completo
+      const BASE_TO_ZA_MEGA = {};
+      for (const [zaName, data] of Object.entries(ZA_MEGA_POKEMON)) {
+        const base = data.baseName || zaName.replace(/-mega$/, "");
+        BASE_TO_ZA_MEGA[base] = zaName;
+      }
 
       // ══════════════════════════════════════════════════════════════════
       //  DAMAGE CALCULATION
@@ -7666,54 +7756,53 @@
             _prefetchMoves(sd.pokeMoves);
             return;
           }
-          // ── Fallback para Mega Evoluciones de Z-A no disponibles en PokeAPI ──
+          // ── ZA Mega Evoluciones — siempre usar datos estáticos ────────
+          const zaStatic = ZA_MEGA_POKEMON[name];
+          if (zaStatic) {
+            const baseName = zaStatic.baseName || name.replace(/-mega$/, "");
+            sd.poke = {
+              id: zaStatic.id,
+              name: baseName,
+              zaName: name,
+              types: zaStatic.types,
+              base: zaStatic.base,
+              abilities: zaStatic.abilities,
+              weight: zaStatic.weight,
+              isZAMega: true,
+            };
+            const _zaExtra = FORM_EXTRA_MOVES[name] || [];
+            sd.pokeMoves = [..._zaExtra].sort();
+            sd._autoSeq = (gs._autoSeq || 0) + 1;
+            gs._autoSeq = sd._autoSeq;
+            sd._autoOrder = sd._autoSeq;
+            if (sd.poke.abilities.length > 0 && sd.ability === "none") {
+              sd.ability = sd.poke.abilities[0];
+            }
+            sd.mega = true;
+            sd.tera = false; sd.zMove = false; sd.dynamax = false;
+            applyMegaStone(s);
+            lsSet(`poke:${name}`, { poke: sd.poke, pokeMoves: sd.pokeMoves });
+            const wSelZA = document.getElementById("weatherSel");
+            const tSelZA = document.getElementById("terrainSel");
+            if (!gs.weatherAutoSource && gs.weather !== "none") { gs.weather = "none"; if (wSelZA) wSelZA.value = "none"; }
+            if (!gs.terrainAutoSource && gs.terrain !== "none") { gs.terrain = "none"; if (tSelZA) tSelZA.value = "none"; }
+            updatePanelSprite(s);
+            updatePanelInfo(s);
+            updateMechUI(s);
+            updateAbilitySelect(s);
+            buildStatsTable(s);
+            calcFinalStats(s);
+            updateStatDisplay(s);
+            initMoveSearch(s);
+            checkAutoConditions();
+            updateAll();
+            _prefetchMoves(sd.pokeMoves);
+            return;
+          }
+          // ── Fetch desde PokeAPI ───────────────────────────────────────
           const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
           if (!r.ok) {
-            const zaStatic = ZA_MEGA_POKEMON[name];
-            if (zaStatic) {
-              // Strip "-mega" to get the base pokemon name, or use explicit baseName
-              const baseName = zaStatic.baseName || name.replace(/-mega$/, "");
-              sd.poke = {
-                id: zaStatic.id,
-                name: baseName,        // store as base name (e.g. "floette-eternal")
-                zaName: name,          // keep full slug for MEGA_DATA lookup
-                types: zaStatic.types, // these are the BASE types before mega
-                base: zaStatic.base,
-                abilities: zaStatic.abilities,
-                weight: zaStatic.weight,
-                isZAMega: true,        // flag so we know it auto-megas
-              };
-              const _zaExtra = FORM_EXTRA_MOVES[name] || [];
-              sd.pokeMoves = [..._zaExtra].sort();
-              sd._autoSeq = (gs._autoSeq || 0) + 1;
-              gs._autoSeq = sd._autoSeq;
-              sd._autoOrder = sd._autoSeq;
-              if (sd.poke.abilities.length > 0 && sd.ability === "none") {
-                sd.ability = sd.poke.abilities[0];
-              }
-              // Auto-activate mega for ZA pokemon — they are already in mega form
-              sd.mega = true;
-              sd.tera = false; sd.zMove = false; sd.dynamax = false;
-              applyMegaStone(s);
-              // Cache to localStorage so next selection is instant
-              lsSet(`poke:${name}`, { poke: sd.poke, pokeMoves: sd.pokeMoves });
-              const wSel = document.getElementById("weatherSel");
-              const tSel = document.getElementById("terrainSel");
-              if (!gs.weatherAutoSource && gs.weather !== "none") { gs.weather = "none"; if (wSel) wSel.value = "none"; }
-              if (!gs.terrainAutoSource && gs.terrain !== "none") { gs.terrain = "none"; if (tSel) tSel.value = "none"; }
-              updatePanelSprite(s);
-              updatePanelInfo(s);
-              updateMechUI(s);
-              updateAbilitySelect(s);
-              buildStatsTable(s);
-              calcFinalStats(s);
-              updateStatDisplay(s);
-              initMoveSearch(s);
-              checkAutoConditions();
-              updateAll();
-              _prefetchMoves(sd.pokeMoves);
-            }
-            return;
+            return; // PokeAPI falló y no es ZA mega — nada que hacer
           }
           const d = await r.json();
           const base = {};
@@ -8607,6 +8696,36 @@
         };
         if (GEN9_SPRITES[k]) return GEN9_SPRITES[k];
         if (GEM_SVG_FALLBACK[k]) return GEM_SVG_FALLBACK[k];
+        // ZA Mega Stones — not in PokeAPI, use inline SVGs with type-color accent
+        function zaStoneSvg(innerColor, outerColor) {
+          return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><polygon points="16,2 28,9 28,23 16,30 4,23 4,9" fill="${outerColor}"/><polygon points="16,2 28,9 16,14 4,9" fill="white" opacity="0.3"/><polygon points="16,8 24,12 24,20 16,24 8,20 8,12" fill="${innerColor}"/><polygon points="16,8 24,12 16,15 8,12" fill="white" opacity="0.4"/><circle cx="16" cy="16" r="3" fill="white" opacity="0.7"/></svg>`)}`;
+        }
+        const ZA_STONE_SVG = {
+          "floettite":              zaStoneSvg("#f48fb1","#e91e8c"),
+          "meganiumite":            zaStoneSvg("#a5d6a7","#388e3c"),
+          "feraligatrite":          zaStoneSvg("#4dd0e1","#0097a7"),
+          "froslasite":             zaStoneSvg("#b3e5fc","#7c4dff"),
+          "emboarite":              zaStoneSvg("#ff8a65","#bf360c"),
+          "chesnaughtite":          zaStoneSvg("#81c784","#c62828"),
+          "delphoxite":             zaStoneSvg("#ff8a65","#f06292"),
+          "greninjite":             zaStoneSvg("#4dd0e1","#37474f"),
+          "clefablite":             zaStoneSvg("#f48fb1","#ce93d8"),
+          "victreebelite":          zaStoneSvg("#aed581","#7b1fa2"),
+          "starmite":               zaStoneSvg("#81d4fa","#ce93d8"),
+          "dragonite":              zaStoneSvg("#ffcc80","#b71c1c"),
+          "skarmite":               zaStoneSvg("#b0bec5","#90a4ae"),
+          "chimechite":             zaStoneSvg("#ce93d8","#4a148c"),
+          "excadrillite":           zaStoneSvg("#ffcc80","#90a4ae"),
+          "chandelurite":           zaStoneSvg("#ce93d8","#e53935"),
+          "golurkite":              zaStoneSvg("#a5d6a7","#37474f"),
+          "meowstite":              zaStoneSvg("#ce93d8","#263238"),
+          "hawluchite":             zaStoneSvg("#ff8a65","#ce93d8"),
+          "crabominable-mega-stone":zaStoneSvg("#b3e5fc","#e53935"),
+          "drampa-mega-stone":      zaStoneSvg("#ffcc80","#1565c0"),
+          "scovillain-mega-stone":  zaStoneSvg("#aed581","#e53935"),
+          "glimmora-mega-stone":    zaStoneSvg("#ef9a9a","#6a1b9a"),
+        };
+        if (ZA_STONE_SVG[k]) return ZA_STONE_SVG[k];
         return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${k}.png`;
       }
 
@@ -8953,7 +9072,16 @@
         const sd = gs[s];
         const btn = document.getElementById(`clearPokeBtn${s}`);
         if (btn) btn.classList.toggle("visible", !!sd.poke);
-        if (!sd.poke) return;
+        if (!sd.poke) {
+          const ring = document.getElementById(`ring${s}`);
+          const img  = document.getElementById(`img${s}`);
+          if (ring) {
+            ring.classList.remove("active", "za-mega");
+            const badge = ring.querySelector(".za-mega-badge");
+            if (badge) badge.remove();
+          }
+          return;
+        }
         const img = document.getElementById(`img${s}`);
         const ph = document.getElementById(`ph${s}`);
         const ring = document.getElementById(`ring${s}`);
@@ -8979,6 +9107,22 @@
         const gmaxId = sd.dynamax && GMAX_SPRITE_ID[sd.poke.name];
         if (gmaxId) targetId = gmaxId;
 
+        // ZA Mega: sprites don't exist yet publicly — show base art with golden ring + badge
+        const isZAMegaActive = sd.poke.isZAMega && sd.mega;
+
+        // Manage ZA mega badge
+        let badge = ring.querySelector(".za-mega-badge");
+        if (isZAMegaActive) {
+          if (!badge) {
+            badge = document.createElement("span");
+            badge.className = "za-mega-badge";
+            badge.textContent = "ZA MEGA";
+            ring.appendChild(badge);
+          }
+        } else {
+          if (badge) badge.remove();
+        }
+
         const artUrlFull = artUrl(targetId, sd.shiny);
         const fallback = smallUrl(targetId);
 
@@ -8986,14 +9130,14 @@
         img.style.display = "block";
         ph.style.display = "none";
         img.classList.add("show");
-        ring.classList.add("active");
+        ring.classList.remove("active", "za-mega");
+        ring.classList.add(isZAMegaActive ? "za-mega" : "active");
         img.src = fallback;
 
         // Load the high-res artwork in the background and swap when ready
         const hires = new Image();
         hires.onload = () => { img.src = artUrlFull; };
         hires.onerror = () => {
-          // Mega/Gigamax artwork not found, fall back to normal
           if (targetId !== sd.poke.id) {
             img.src = artUrl(sd.poke.id, sd.shiny);
           }
